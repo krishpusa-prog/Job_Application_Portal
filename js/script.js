@@ -1,23 +1,5 @@
-// Sample job data
-// Force load jobs on any page with jobs-grid
-window.onload = function() {
-    console.log("Page loaded:", window.location.href);
-    
-    // Check for jobs grid and load if empty
-    setTimeout(() => {
-        const jobsGrid = document.querySelector('.jobs-grid');
-        if (jobsGrid && jobsGrid.children.length === 0) {
-            console.log("Jobs grid is empty, loading jobs...");
-            
-            if (document.querySelector('.featured-jobs')) {
-                loadFeaturedJobs();
-            } else if (document.querySelector('.job-listings')) {
-                loadAllJobs();
-            }
-        }
-    }, 500);
-};
-const jobsData = [
+
+const JOBS_DATA = [
     {
         id: 1,
         title: "Frontend Developer",
@@ -92,201 +74,88 @@ const jobsData = [
     }
 ];
 
-// Debug function
-function debugLog(message, data = null) {
-    console.log(`[DEBUG] ${message}`, data || '');
-}
 
-// Initialize local storage data
-function initializeLocalStorage() {
-    debugLog("Initializing localStorage");
+const Storage = {
+    get: (key) => {
+        try {
+            return JSON.parse(localStorage.getItem(key)) || null;
+        } catch {
+            return localStorage.getItem(key);
+        }
+    },
     
-    if (!localStorage.getItem('appliedJobs')) {
-        localStorage.setItem('appliedJobs', JSON.stringify([2, 4]));
-        debugLog("Set default applied jobs");
-    }
-    if (!localStorage.getItem('savedJobs')) {
-        localStorage.setItem('savedJobs', JSON.stringify([1, 3]));
-        debugLog("Set default saved jobs");
-    }
-    if (!localStorage.getItem('userName')) {
-        localStorage.setItem('userName', 'Demo User');
-    }
-    if (!localStorage.getItem('userEmail')) {
-        localStorage.setItem('userEmail', 'demo@example.com');
-    }
-}
+    set: (key, value) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            return true;
+        } catch {
+            return false;
+        }
+    },
+    
+    remove: (key) => localStorage.removeItem(key),
+    
+    clear: () => localStorage.clear()
+};
 
-// DOM Content Loaded with error handling
-document.addEventListener('DOMContentLoaded', function() {
-    debugLog("DOM fully loaded and parsed");
-    console.log("Current page:", window.location.pathname);
+const JobStorage = {
+    getAppliedJobs: () => Storage.get('appliedJobs') || [],
+    getSavedJobs: () => Storage.get('savedJobs') || [],
     
-    try {
-        initializeLocalStorage();
+    saveAppliedJob: (jobId) => {
+        const appliedJobs = JobStorage.getAppliedJobs();
+        if (!appliedJobs.includes(jobId)) {
+            appliedJobs.push(jobId);
+            return Storage.set('appliedJobs', appliedJobs);
+        }
+        return false;
+    },
+    
+    toggleSavedJob: (jobId) => {
+        let savedJobs = JobStorage.getSavedJobs();
+        const index = savedJobs.indexOf(jobId);
         
-        // Check which page we're on and load appropriate content
-        const currentPage = window.location.pathname;
-        
-        // Load featured jobs on homepage
-        if (currentPage.includes('index.html') || currentPage === '/' || currentPage.endsWith('/')) {
-            debugLog("Loading homepage");
-            loadFeaturedJobs();
+        if (index === -1) {
+            savedJobs.push(jobId);
+        } else {
+            savedJobs.splice(index, 1);
         }
         
-        // Load all jobs on jobs page
-        if (currentPage.includes('jobs.html')) {
-            debugLog("Loading jobs page");
-            loadAllJobs();
-            setupFilters();
-        }
-        
-        // Load job details if on job details page
-        if (currentPage.includes('job-details.html')) {
-            debugLog("Loading job details page");
-            loadJobDetails();
-        }
-        
-        // Load dashboard data
-        if (currentPage.includes('dashboard.html')) {
-            debugLog("Loading dashboard");
-            loadDashboard();
-        }
-        
-        // Setup application form
-        const applyForm = document.getElementById('applyForm');
-        if (applyForm) {
-            debugLog("Setting up application form");
-            setupApplicationForm();
-        }
-        
-        // Setup event listeners
-        setupEventListeners();
-        
-        debugLog("Initialization complete");
-        
-    } catch (error) {
-        console.error("Error during initialization:", error);
-        // Show error to user
+        return Storage.set('savedJobs', savedJobs);
+    },
+    
+    isJobApplied: (jobId) => JobStorage.getAppliedJobs().includes(jobId),
+    isJobSaved: (jobId) => JobStorage.getSavedJobs().includes(jobId)
+};
+
+const UI = {
+    showError: (message) => {
         const errorDiv = document.createElement('div');
-        errorDiv.style.cssText = 'background: #fee; color: #c00; padding: 10px; margin: 10px; border: 1px solid #c00;';
-        errorDiv.innerHTML = `<strong>JavaScript Error:</strong> ${error.message}`;
+        errorDiv.className = 'error-message';
+        errorDiv.innerHTML = `<strong>Error:</strong> ${message}`;
+        errorDiv.style.cssText = 'background: #fee; color: #c00; padding: 10px; margin: 10px; border: 1px solid #c00; border-radius: 5px;';
         document.body.prepend(errorDiv);
+        setTimeout(() => errorDiv.remove(), 5000);
+    },
+    
+    showAlert: (message, type = 'info') => {
+        alert(message); 
+    },
+    
+    toggleMobileMenu: () => {
+        const nav = document.querySelector('.nav');
+        if (nav) nav.classList.toggle('active');
     }
-});
+};
 
-// Setup event listeners
-function setupEventListeners() {
-    debugLog("Setting up event listeners");
-    
-    // Mobile menu toggle
-    const mobileMenu = document.querySelector('.mobile-menu');
-    if (mobileMenu) {
-        mobileMenu.addEventListener('click', function() {
-            const nav = document.querySelector('.nav');
-            nav.classList.toggle('active');
-        });
-    }
-    
-    // Search button
-    const searchBtn = document.querySelector('.search-box .btn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', function() {
-            const keyword = document.querySelector('.search-box input:first-child')?.value || '';
-            const location = document.querySelector('.search-box input:last-child')?.value || '';
-            
-            if (keyword || location) {
-                alert(`Searching for "${keyword}" jobs in "${location}"...\n\n(For demo, this would filter jobs)`);
-                window.location.href = `./jobs.html?search=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
-            }
-        });
-    }
-    
-    // Login/Register buttons
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const userName = prompt('Enter your name (demo login):', localStorage.getItem('userName') || '');
-            if (userName) {
-                localStorage.setItem('userName', userName);
-                alert(`Welcome back, ${userName}!`);
-                window.location.href = './dashboard.html';
-            }
-        });
-    }
-    
-    const registerBtn = document.getElementById('registerBtn');
-    if (registerBtn) {
-        registerBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const userName = prompt('Create a username for your account:');
-            const userEmail = prompt('Enter your email:');
-            
-            if (userName && userEmail) {
-                localStorage.setItem('userName', userName);
-                localStorage.setItem('userEmail', userEmail);
-                alert(`Account created successfully! Welcome ${userName}.`);
-                window.location.href = './dashboard.html';
-            }
-        });
-    }
-}
 
-// Load featured jobs (homepage)
-function loadFeaturedJobs() {
-    debugLog("Loading featured jobs");
-    const jobsGrid = document.querySelector('.jobs-grid');
-    
-    if (!jobsGrid) {
-        console.warn("Jobs grid not found on this page");
-        return;
-    }
-    
-    jobsGrid.innerHTML = '';
-    
-    // Show first 4 jobs
-    jobsData.slice(0, 4).forEach(job => {
-        const jobCard = createJobCard(job);
-        jobsGrid.appendChild(jobCard);
-    });
-    
-    debugLog(`Loaded ${Math.min(4, jobsData.length)} featured jobs`);
-}
-
-// Load all jobs (jobs page)
-function loadAllJobs(filteredJobs = jobsData) {
-    debugLog("Loading all jobs", { count: filteredJobs.length });
-    const jobsGrid = document.querySelector('.jobs-grid');
-    
-    if (!jobsGrid) {
-        console.warn("Jobs grid not found on jobs page");
-        return;
-    }
-    
-    jobsGrid.innerHTML = '';
-    
-    if (filteredJobs.length === 0) {
-        jobsGrid.innerHTML = '<p class="no-jobs" style="text-align:center; padding:40px; color:#666;">No jobs found matching your criteria.</p>';
-        return;
-    }
-    
-    filteredJobs.forEach(job => {
-        const jobCard = createJobCard(job);
-        jobsGrid.appendChild(jobCard);
-    });
-    
-    debugLog(`Loaded ${filteredJobs.length} jobs`);
-}
-
-// Create job card element
 function createJobCard(job) {
+    const isApplied = JobStorage.isJobApplied(job.id);
+    const isSaved = JobStorage.isJobSaved(job.id);
+    
     const jobCard = document.createElement('div');
     jobCard.className = 'job-card';
     jobCard.dataset.id = job.id;
-    
-    const isSaved = getSavedJobs().includes(job.id);
-    const isApplied = getAppliedJobs().includes(job.id);
     
     jobCard.innerHTML = `
         <h3 class="job-title">${job.title}</h3>
@@ -297,128 +166,153 @@ function createJobCard(job) {
             <span><i class="fas fa-clock"></i> ${job.type}</span>
         </div>
         <p class="job-description">${job.description.substring(0, 100)}...</p>
-        <div class="job-actions" style="display: flex; gap: 10px; margin-top: 15px;">
-            <a href="./job-details.html?id=${job.id}" class="btn" style="flex: 1;">View Details</a>
+        <div class="job-actions">
+            <a href="./job-details.html?id=${job.id}" class="btn">View Details</a>
             <button class="btn ${isApplied ? 'btn-secondary' : 'btn-success'} apply-btn" 
                     data-id="${job.id}" 
-                    ${isApplied ? 'disabled' : ''}
-                    style="flex: 1;">
+                    ${isApplied ? 'disabled' : ''}>
                 ${isApplied ? 'Applied' : 'Apply Now'}
             </button>
             <button class="btn ${isSaved ? 'btn-danger' : 'btn-secondary'} save-btn" 
-                    data-id="${job.id}"
-                    style="flex: 1;">
+                    data-id="${job.id}">
                 ${isSaved ? 'Unsave' : 'Save Job'}
             </button>
         </div>
     `;
     
-    // Add event listeners for buttons
+
     const applyBtn = jobCard.querySelector('.apply-btn');
     const saveBtn = jobCard.querySelector('.save-btn');
     
-    applyBtn.addEventListener('click', function(e) {
+    applyBtn?.addEventListener('click', (e) => {
         e.preventDefault();
-        const jobId = parseInt(this.dataset.id);
-        if (applyToJob(jobId)) {
-            this.textContent = 'Applied';
-            this.classList.remove('btn-success');
-            this.classList.add('btn-secondary');
-            this.disabled = true;
-        }
+        applyToJob(job.id, applyBtn);
     });
     
-    saveBtn.addEventListener('click', function(e) {
+    saveBtn?.addEventListener('click', (e) => {
         e.preventDefault();
-        const jobId = parseInt(this.dataset.id);
-        toggleSaveJob(jobId, this);
+        toggleSaveJob(job.id, saveBtn);
     });
     
     return jobCard;
 }
 
-// Setup filters on jobs page
-function setupFilters() {
-    const jobTypeFilter = document.getElementById('jobTypeFilter');
-    const locationFilter = document.getElementById('locationFilter');
-    const salaryFilter = document.getElementById('salaryFilter');
-    const filterBtn = document.getElementById('filterBtn');
-    const clearBtn = document.getElementById('clearBtn');
+function loadFeaturedJobs() {
+    const jobsGrid = document.querySelector('.jobs-grid');
+    if (!jobsGrid) return;
     
-    if (!filterBtn) {
-        console.warn("Filter button not found");
+    jobsGrid.innerHTML = '';
+    JOBS_DATA.slice(0, 4).forEach(job => {
+        jobsGrid.appendChild(createJobCard(job));
+    });
+}
+
+function loadAllJobs(filteredJobs = JOBS_DATA) {
+    const jobsGrid = document.querySelector('.jobs-grid');
+    if (!jobsGrid) return;
+    
+    jobsGrid.innerHTML = '';
+    
+    if (filteredJobs.length === 0) {
+        jobsGrid.innerHTML = '<p class="no-jobs">No jobs found matching your criteria.</p>';
         return;
     }
     
-    filterBtn.addEventListener('click', function() {
-        const selectedType = jobTypeFilter?.value || 'all';
-        const selectedLocation = (locationFilter?.value || '').toLowerCase();
-        const selectedSalary = salaryFilter?.value || 'all';
+    filteredJobs.forEach(job => {
+        jobsGrid.appendChild(createJobCard(job));
+    });
+}
+
+function applyToJob(jobId, buttonElement = null) {
+    if (JobStorage.saveAppliedJob(jobId)) {
+        UI.showAlert('Application submitted successfully!', 'success');
         
-        let filtered = jobsData;
-        
-        if (selectedType !== 'all') {
-            filtered = filtered.filter(job => job.type === selectedType);
+        if (buttonElement) {
+            buttonElement.textContent = 'Applied';
+            buttonElement.classList.replace('btn-success', 'btn-secondary');
+            buttonElement.disabled = true;
         }
         
-        if (selectedLocation) {
-            filtered = filtered.filter(job => job.location.toLowerCase().includes(selectedLocation));
+  
+        if (window.location.pathname.includes('dashboard.html')) {
+            loadDashboard();
         }
         
-        if (selectedSalary !== 'all') {
-            // Simple salary filtering for demo
-            filtered = filtered.filter(job => {
-                const salaryStr = job.salary.replace(/[^0-9\-]/g, '');
-                const match = salaryStr.match(/(\d+)/);
-                if (!match) return true;
-                
-                const salary = parseInt(match[1]);
-                if (selectedSalary === 'low') return salary < 50000;
-                if (selectedSalary === 'medium') return salary >= 50000 && salary < 80000;
-                if (selectedSalary === 'high') return salary >= 80000;
-                return true;
-            });
-        }
+        return true;
+    }
+    
+    UI.showAlert('You have already applied for this job.', 'warning');
+    return false;
+}
+
+function toggleSaveJob(jobId, buttonElement = null) {
+    const wasSaved = JobStorage.isJobSaved(jobId);
+    JobStorage.toggleSavedJob(jobId);
+    const isNowSaved = JobStorage.isJobSaved(jobId);
+    
+    if (buttonElement) {
+        buttonElement.textContent = isNowSaved ? 'Unsave' : 'Save Job';
+        buttonElement.classList.toggle('btn-danger', isNowSaved);
+        buttonElement.classList.toggle('btn-secondary', !isNowSaved);
+    }
+    
+    UI.showAlert(isNowSaved ? 'Job saved to your list!' : 'Job removed from saved list.', 'info');
+    
+
+    if (window.location.pathname.includes('dashboard.html')) {
+        loadDashboard();
+    }
+}
+
+
+function setupFilters() {
+    const filterBtn = document.getElementById('filterBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    
+    if (!filterBtn) return;
+    
+    filterBtn.addEventListener('click', () => {
+        const jobType = document.getElementById('jobTypeFilter')?.value || 'all';
+        const location = (document.getElementById('locationFilter')?.value || '').toLowerCase();
+        const salary = document.getElementById('salaryFilter')?.value || 'all';
+        
+        const filtered = JOBS_DATA.filter(job => {
+            if (jobType !== 'all' && job.type !== jobType) return false;
+            if (location && !job.location.toLowerCase().includes(location)) return false;
+            if (salary !== 'all') {
+                const salaryNum = parseInt(job.salary.replace(/[^0-9]/g, ''));
+                if (salary === 'low' && salaryNum >= 50000) return false;
+                if (salary === 'medium' && (salaryNum < 50000 || salaryNum >= 80000)) return false;
+                if (salary === 'high' && salaryNum < 80000) return false;
+            }
+            return true;
+        });
         
         loadAllJobs(filtered);
     });
     
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function() {
-            if (jobTypeFilter) jobTypeFilter.value = 'all';
-            if (locationFilter) locationFilter.value = '';
-            if (salaryFilter) salaryFilter.value = 'all';
-            loadAllJobs(jobsData);
-        });
-    }
+    clearBtn?.addEventListener('click', () => {
+        document.getElementById('jobTypeFilter').value = 'all';
+        document.getElementById('locationFilter').value = '';
+        document.getElementById('salaryFilter').value = 'all';
+        loadAllJobs(JOBS_DATA);
+    });
 }
 
-// Load job details page
 function loadJobDetails() {
     const urlParams = new URLSearchParams(window.location.search);
     const jobId = parseInt(urlParams.get('id'));
-    
-    debugLog("Loading job details", { jobId });
-    
-    if (!jobId) {
-        document.querySelector('.job-detail-container').innerHTML = '<p>Job not found. <a href="./jobs.html">Browse Jobs</a></p>';
-        return;
-    }
-    
-    const job = jobsData.find(j => j.id === jobId);
+    const job = JOBS_DATA.find(j => j.id === jobId);
     
     if (!job) {
-        document.querySelector('.job-detail-container').innerHTML = '<p>Job not found. <a href="./jobs.html">Browse Jobs</a></p>';
+        document.querySelector('.job-detail-container').innerHTML = 
+            '<p>Job not found. <a href="./jobs.html">Browse Jobs</a></p>';
         return;
     }
     
-    const jobHeader = document.querySelector('.job-header');
-    const jobDescription = document.querySelector('.job-description-content');
-    const jobRequirements = document.querySelector('.job-requirements-content');
-    const jobBenefits = document.querySelector('.job-benefits-content');
-    
-    if (jobHeader) {
-        jobHeader.innerHTML = `
+
+    const elements = {
+        '.job-header': `
             <h1>${job.title}</h1>
             <p class="job-company">${job.company}</p>
             <div class="job-meta">
@@ -427,510 +321,185 @@ function loadJobDetails() {
                 <span><i class="fas fa-clock"></i> ${job.type}</span>
                 <span><i class="fas fa-calendar"></i> ${job.posted}</span>
             </div>
-        `;
-    }
+        `,
+        '.job-description-content': job.description,
+        '.job-requirements-content': job.requirements.map(req => `<li>${req}</li>`).join(''),
+        '.job-benefits-content': job.benefits.map(benefit => `<li>${benefit}</li>`).join('')
+    };
     
-    if (jobDescription) {
-        jobDescription.textContent = job.description;
-    }
+    Object.entries(elements).forEach(([selector, content]) => {
+        const element = document.querySelector(selector);
+        if (element) element.innerHTML = content;
+    });
     
-    if (jobRequirements) {
-        jobRequirements.innerHTML = job.requirements.map(req => `<li>${req}</li>`).join('');
-    }
-    
-    if (jobBenefits) {
-        jobBenefits.innerHTML = job.benefits.map(benefit => `<li>${benefit}</li>`).join('');
-    }
-    
-    // Update apply button
+    // Setup buttons
     const applyBtn = document.querySelector('.apply-btn-detail');
-    const isApplied = getAppliedJobs().includes(jobId);
+    const saveBtn = document.querySelector('.save-btn-detail');
     
     if (applyBtn) {
-        applyBtn.dataset.id = jobId;
+        const isApplied = JobStorage.isJobApplied(jobId);
         if (isApplied) {
             applyBtn.textContent = 'Already Applied';
-            applyBtn.classList.remove('btn-success');
-            applyBtn.classList.add('btn-secondary');
+            applyBtn.classList.replace('btn-success', 'btn-secondary');
             applyBtn.disabled = true;
-        }
-        
-        applyBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (!isApplied) {
+        } else {
+            applyBtn.addEventListener('click', () => {
                 window.location.href = `./apply.html?id=${jobId}`;
-            }
-        });
+            });
+        }
     }
     
-    // Update save button
-    const saveBtn = document.querySelector('.save-btn-detail');
-    const isSaved = getSavedJobs().includes(jobId);
-    
     if (saveBtn) {
-        saveBtn.dataset.id = jobId;
-        if (isSaved) {
-            saveBtn.textContent = 'Unsave Job';
-            saveBtn.classList.remove('btn-secondary');
-            saveBtn.classList.add('btn-danger');
-        }
+        const isSaved = JobStorage.isJobSaved(jobId);
+        saveBtn.textContent = isSaved ? 'Unsave Job' : 'Save Job';
+        saveBtn.classList.toggle('btn-danger', isSaved);
+        saveBtn.classList.toggle('btn-secondary', !isSaved);
         
-        saveBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const jobId = parseInt(this.dataset.id);
-            toggleSaveJob(jobId, this);
+        saveBtn.addEventListener('click', () => {
+            toggleSaveJob(jobId, saveBtn);
         });
     }
 }
 
-// Setup application form
 function setupApplicationForm() {
-    const applyForm = document.getElementById('applyForm');
+    const form = document.getElementById('applyForm');
+    if (!form) return;
+    
     const urlParams = new URLSearchParams(window.location.search);
     const jobId = parseInt(urlParams.get('id'));
+    const job = JOBS_DATA.find(j => j.id === jobId);
     
-    debugLog("Setting up application form", { jobId });
-    
-    if (jobId) {
-        const job = jobsData.find(j => j.id === jobId);
-        if (job) {
-            const jobTitleEl = document.getElementById('jobTitle');
-            const companyNameEl = document.getElementById('companyName');
-            
-            if (jobTitleEl) jobTitleEl.textContent = job.title;
-            if (companyNameEl) companyNameEl.textContent = job.company;
-        }
+    if (job) {
+        document.getElementById('jobTitle').textContent = job.title;
+        document.getElementById('companyName').textContent = job.company;
     }
     
-    if (!applyForm) {
-        console.warn("Application form not found");
-        return;
-    }
-    
-    applyForm.addEventListener('submit', function(e) {
+    form.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        const name = document.getElementById('name')?.value || '';
-        const email = document.getElementById('email')?.value || '';
-        const phone = document.getElementById('phone')?.value || '';
-        const coverLetter = document.getElementById('coverLetter')?.value || '';
+        const name = document.getElementById('name')?.value.trim();
+        const email = document.getElementById('email')?.value.trim();
+        const phone = document.getElementById('phone')?.value.trim();
         
         if (!name || !email || !phone) {
-            alert('Please fill in all required fields.');
+            UI.showAlert('Please fill in all required fields.', 'warning');
             return;
         }
         
-        // In a real app, you would send this data to a server
-        if (jobId && !getAppliedJobs().includes(jobId)) {
-            saveAppliedJob(jobId);
+        if (jobId && !JobStorage.isJobApplied(jobId)) {
+            JobStorage.saveAppliedJob(jobId);
+            Storage.set('userName', name);
+            Storage.set('userEmail', email);
             
-            // Update user info
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userEmail', email);
-            
-            alert(`Application submitted successfully for ${jobsData.find(j => j.id === jobId)?.title || 'the job'}!\n\nWe'll contact you at ${email} if selected.`);
-            window.location.href = './dashboard.html';
-        } else if (getAppliedJobs().includes(jobId)) {
-            alert('You have already applied for this job.');
-            window.location.href = `./job-details.html?id=${jobId}`;
-        } else {
-            alert('Job not found. Returning to job listings.');
-            window.location.href = './jobs.html';
+            UI.showAlert(`Application submitted successfully for ${job?.title || 'the job'}!\n\nWe'll contact you at ${email} if selected.`, 'success');
+            setTimeout(() => window.location.href = './dashboard.html', 1500);
+        } else if (JobStorage.isJobApplied(jobId)) {
+            UI.showAlert('You have already applied for this job.', 'warning');
         }
     });
 }
 
-// Load dashboard data
 function loadDashboard() {
-    debugLog("Loading dashboard");
-    
-    const appliedJobs = getAppliedJobs();
-    const savedJobs = getSavedJobs();
-    const userName = localStorage.getItem('userName') || 'User';
-    const userEmail = localStorage.getItem('userEmail') || '';
-    
-    // Update user info
-    const userNameEl = document.getElementById('userName');
-    const profileNameEl = document.getElementById('profileName');
-    const profileEmailEl = document.getElementById('profileEmail');
-    
-    if (userNameEl) userNameEl.textContent = `Welcome, ${userName}!`;
-    if (profileNameEl) profileNameEl.textContent = userName;
-    if (profileEmailEl) profileEmailEl.textContent = userEmail;
-    
-    // Update stats
-    const appliedCountEl = document.getElementById('appliedCount');
-    const savedCountEl = document.getElementById('savedCount');
-    
-    if (appliedCountEl) appliedCountEl.textContent = appliedJobs.length;
-    if (savedCountEl) savedCountEl.textContent = savedJobs.length;
-    
-    // Load applied jobs
-    const appliedJobsList = document.getElementById('appliedJobsList');
-    if (appliedJobsList) {
-        appliedJobsList.innerHTML = '';
-        
-        if (appliedJobs.length === 0) {
-            appliedJobsList.innerHTML = '<p>You haven\'t applied to any jobs yet. <a href="./jobs.html">Browse Jobs</a></p>';
-        } else {
-            appliedJobs.forEach(jobId => {
-                const job = jobsData.find(j => j.id === jobId);
-                if (job) {
-                    const statuses = ['pending', 'viewed', 'rejected', 'accepted'];
-                    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-                    
-                    const item = document.createElement('div');
-                    item.className = 'application-item';
-                    item.innerHTML = `
-                        <div>
-                            <strong>${job.title}</strong>
-                            <p>${job.company} • ${job.location}</p>
-                        </div>
-                        <span class="status status-${randomStatus}">${randomStatus.charAt(0).toUpperCase() + randomStatus.slice(1)}</span>
-                    `;
-                    appliedJobsList.appendChild(item);
-                }
-            });
-        }
-    }
-    
-    // Load saved jobs
-    const savedJobsList = document.getElementById('savedJobsList');
-    if (savedJobsList) {
-        savedJobsList.innerHTML = '';
-        
-        if (savedJobs.length === 0) {
-            savedJobsList.innerHTML = '<p>You haven\'t saved any jobs yet. <a href="./jobs.html">Browse Jobs</a></p>';
-        } else {
-            savedJobs.forEach(jobId => {
-                const job = jobsData.find(j => j.id === jobId);
-                if (job) {
-                    const item = document.createElement('div');
-                    item.className = 'saved-job-item';
-                    item.innerHTML = `
-                        <div>
-                            <strong>${job.title}</strong>
-                            <p>${job.company} • ${job.location} • ${job.salary}</p>
-                        </div>
-                        <a href="./job-details.html?id=${job.id}" class="btn">View</a>
-                    `;
-                    savedJobsList.appendChild(item);
-                }
-            });
-        }
-    }
+    updateDashboardProfile();
+    updateDashboardStats();
+    loadApplicationsList();
+    loadSavedJobsList();
+    loadActivityTimeline();
+    setupDashboardListeners();
 }
 
-// Utility functions for localStorage
-function getAppliedJobs() {
-    try {
-        return JSON.parse(localStorage.getItem('appliedJobs')) || [];
-    } catch (e) {
-        console.error("Error reading applied jobs:", e);
-        return [];
-    }
-}
+function updateDashboardProfile() {
+    const userName = Storage.get('userName') || 'Job Seeker';
+    const userEmail = Storage.get('userEmail') || 'Click Edit to add email';
+    
 
-function getSavedJobs() {
-    try {
-        return JSON.parse(localStorage.getItem('savedJobs')) || [];
-    } catch (e) {
-        console.error("Error reading saved jobs:", e);
-        return [];
-    }
-}
-
-function saveAppliedJob(jobId) {
-    try {
-        let appliedJobs = getAppliedJobs();
-        if (!appliedJobs.includes(jobId)) {
-            appliedJobs.push(jobId);
-            localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-            debugLog(`Saved job ${jobId} to applied jobs`);
-            return true;
-        }
-        return false;
-    } catch (e) {
-        console.error("Error saving applied job:", e);
-        return false;
-    }
-}
-
-function toggleSaveJob(jobId, buttonElement) {
-    try {
-        let savedJobs = getSavedJobs();
-        const index = savedJobs.indexOf(jobId);
-        
-        if (index === -1) {
-            // Save job
-            savedJobs.push(jobId);
-            if (buttonElement) {
-                buttonElement.textContent = 'Unsave';
-                buttonElement.classList.remove('btn-secondary');
-                buttonElement.classList.add('btn-danger');
-            }
-            alert('Job saved to your list!');
-        } else {
-            // Unsave job
-            savedJobs.splice(index, 1);
-            if (buttonElement) {
-                buttonElement.textContent = 'Save Job';
-                buttonElement.classList.remove('btn-danger');
-                buttonElement.classList.add('btn-secondary');
-            }
-            alert('Job removed from saved list.');
-        }
-        
-        localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
-        
-        // Update dashboard if on dashboard page
-        if (window.location.pathname.includes('dashboard.html')) {
-            loadDashboard();
-        }
-        
-        return true;
-    } catch (e) {
-        console.error("Error toggling saved job:", e);
-        return false;
-    }
-}
-
-// Apply to job function
-function applyToJob(jobId) {
-    if (saveAppliedJob(jobId)) {
-        alert('Application submitted successfully!');
-        return true;
-    } else {
-        alert('You have already applied for this job.');
-        return false;
-    }
-}
-
-// Fallback: If jobs don't load, add a manual load button
-window.addEventListener('load', function() {
-    // Check if jobs loaded after 1 second
-    setTimeout(() => {
-        const jobsGrid = document.querySelector('.jobs-grid');
-        if (jobsGrid && jobsGrid.children.length === 0) {
-            // Add a manual load button
-            const manualLoadBtn = document.createElement('button');
-            manualLoadBtn.textContent = 'Load Jobs Manually';
-            manualLoadBtn.className = 'btn';
-            manualLoadBtn.style.cssText = 'display: block; margin: 20px auto; padding: 15px 30px;';
-            manualLoadBtn.onclick = function() {
-                if (window.location.pathname.includes('jobs.html') || window.location.pathname === '/') {
-                    loadAllJobs();
-                } else if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
-                    loadFeaturedJobs();
-                }
-                this.remove();
-            };
-            
-            const container = document.querySelector('.container') || document.body;
-            container.appendChild(manualLoadBtn);
-            
-            console.warn("Jobs failed to load automatically. Manual load button added.");
-        }
-    }, 1000);
-});
-// Dashboard-specific functions
-function updateDashboardStats() {
-    const appliedJobs = getAppliedJobs();
-    const savedJobs = getSavedJobs();
-    
-    // Update counts
-    const appliedCountEl = document.getElementById('appliedCount');
-    const savedCountEl = document.getElementById('savedCount');
-    
-    if (appliedCountEl) appliedCountEl.textContent = appliedJobs.length;
-    if (savedCountEl) savedCountEl.textContent = savedJobs.length;
-    
-    // Calculate other stats (simulated)
-    const viewedCount = Math.floor(Math.random() * 50) + 10;
-    const interviewsCount = Math.min(Math.floor(appliedJobs.length * 0.3), 5);
-    
-    const viewedCountEl = document.getElementById('viewedCount');
-    const interviewsCountEl = document.getElementById('interviewsCount');
-    
-    if (viewedCountEl) viewedCountEl.textContent = viewedCount;
-    if (interviewsCountEl) interviewsCountEl.textContent = interviewsCount;
-}
-
-function loadApplicationsList() {
-    const applicationsList = document.getElementById('applicationsList');
-    if (!applicationsList) return;
-    
-    const appliedJobs = getAppliedJobs();
-    
-    if (appliedJobs.length === 0) {
-        applicationsList.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-file-alt"></i>
-                <p>No applications yet</p>
-                <a href="./jobs.html" class="btn">Browse Jobs</a>
-            </div>
-        `;
-        return;
-    }
-    
-    let applicationsHTML = '';
-    const statuses = ['pending', 'viewed', 'rejected', 'accepted', 'interview'];
-    const statusLabels = {
-        'pending': 'Pending Review',
-        'viewed': 'Viewed',
-        'rejected': 'Not Selected',
-        'accepted': 'Accepted',
-        'interview': 'Interview Scheduled'
+    const profileData = {
+        'profileName': userName,
+        'profileEmail': userEmail,
+        'userEmailDisplay': userEmail,
+        'headerUserName': userName,
+        'welcomeMessage': getTimeBasedGreeting(userName)
     };
     
-    // Get the 5 most recent applications (based on demo data)
-    appliedJobs.slice(-5).reverse().forEach(jobId => {
-        const job = jobsData.find(j => j.id === jobId);
-        if (job) {
-            // Assign random status for demo
-            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-            const daysAgo = Math.floor(Math.random() * 7) + 1;
-            
-            applicationsHTML += `
-                <div class="application-item">
-                    <div class="application-info">
-                        <h4>${job.title}</h4>
-                        <p>${job.company} • Applied ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago</p>
-                    </div>
-                    <div class="application-actions">
-                        <span class="status status-${randomStatus}">${statusLabels[randomStatus]}</span>
-                        <a href="./job-details.html?id=${job.id}" class="btn btn-icon">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </div>
-                </div>
-            `;
-        }
+    Object.entries(profileData).forEach(([id, text]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = text;
     });
     
-    applicationsList.innerHTML = applicationsHTML;
-}
-
-function loadSavedJobsList() {
-    const savedJobsList = document.getElementById('savedJobsList');
-    if (!savedJobsList) return;
-    
-    const savedJobs = getSavedJobs();
-    
-    if (savedJobs.length === 0) {
-        savedJobsList.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-bookmark"></i>
-                <p>No saved jobs yet</p>
-                <a href="./jobs.html" class="btn">Browse Jobs</a>
-            </div>
-        `;
-        return;
-    }
-    
-    let savedJobsHTML = '';
-    
-    // Get the 5 most recent saved jobs
-    savedJobs.slice(-5).reverse().forEach(jobId => {
-        const job = jobsData.find(j => j.id === jobId);
-        if (job) {
-            const daysAgo = Math.floor(Math.random() * 5) + 1;
-            
-            savedJobsHTML += `
-                <div class="saved-job-item">
-                    <div class="saved-job-info">
-                        <h4>${job.title}</h4>
-                        <p>${job.company} • ${job.location} • Saved ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago</p>
-                    </div>
-                    <div class="saved-job-actions">
-                        <button class="btn btn-icon unsave-btn" data-id="${job.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <a href="./job-details.html?id=${job.id}" class="btn btn-icon">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    </div>
-                </div>
-            `;
-        }
-    });
-    
-    savedJobsList.innerHTML = savedJobsHTML;
-    
-    // Add event listeners to unsave buttons
-    document.querySelectorAll('.unsave-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const jobId = parseInt(this.dataset.id);
-            if (confirm('Remove this job from saved list?')) {
-                toggleSaveJob(jobId, null);
-                loadSavedJobsList();
-            }
-        });
-    });
-}
-
-// ========== DASHBOARD FUNCTIONS ==========
-
-// Load dashboard data
-function loadDashboard() {
-    console.log("Loading dashboard...");
-    
-    // Load profile information
-    loadDashboardProfile();
-    
-    // Load applications list
-    loadApplicationsList();
-    
-    // Load saved jobs list
-    loadSavedJobsList();
-    
-    // Update all dashboard statistics
-    updateDashboardStats();
-    
-    // Set up dashboard-specific event listeners
-    setupDashboardListeners();
-    
-    // Add sample activity timeline
-    loadActivityTimeline();
-}
-
-// Load and display user profile information
-function loadDashboardProfile() {
-    const userName = localStorage.getItem('userName') || 'Job Seeker';
-    const userEmail = localStorage.getItem('userEmail') || 'Click Edit to add email';
-    
-    // Update all profile elements
-    const profileElements = [
-        {id: 'profileName', text: userName},
-        {id: 'profileEmail', text: userEmail},
-        {id: 'welcomeMessage', text: `Welcome back, ${userName}!`},
-        {id: 'userEmailDisplay', text: userEmail},
-        {id: 'headerUserName', text: userName}
-    ];
-    
-    profileElements.forEach(item => {
-        const element = document.getElementById(item.id);
-        if (element) {
-            element.textContent = item.text;
-        }
-    });
-    
-    // Set time-based greeting
-    setTimeBasedGreeting();
-    
-    // Calculate and display profile completion
     updateProfileCompletion();
 }
 
-// Load applications list for dashboard
-function loadApplicationsList() {
-    const applicationsList = document.getElementById('applicationsList');
-    if (!applicationsList) return;
+function getTimeBasedGreeting(name) {
+    const hour = new Date().getHours();
+    let greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+    return `${greeting}, ${name}!`;
+}
+
+function updateProfileCompletion() {
+    let completion = 40;
+    if (Storage.get('userName') !== 'Demo User') completion += 20;
+    if (Storage.get('userEmail') !== 'demo@example.com') completion += 20;
+    if (JobStorage.getAppliedJobs().length > 0) completion += 10;
+    if (JobStorage.getSavedJobs().length > 0) completion += 10;
     
-    const appliedJobs = getAppliedJobs();
+    const element = document.getElementById('profileCompletion');
+    if (element) {
+        element.textContent = `${Math.min(completion, 100)}%`;
+        
+
+        const colors = { low: '#ef4444', medium: '#f59e0b', high: '#10b981' };
+        element.style.color = completion < 50 ? colors.low : completion < 80 ? colors.medium : colors.high;
+    }
+}
+
+function updateDashboardStats() {
+    const appliedJobs = JobStorage.getAppliedJobs();
+    const savedJobs = JobStorage.getSavedJobs();
+    
+    const stats = {
+        'appliedCount': appliedJobs.length,
+        'savedCount': savedJobs.length,
+        'viewedCount': Math.floor(Math.random() * 30) + appliedJobs.length,
+        'interviewsCount': Math.min(Math.floor(appliedJobs.length * 0.3), appliedJobs.length)
+    };
+    
+    Object.entries(stats).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    });
+    
+    updateResponseRate();
+}
+
+function updateResponseRate() {
+    const appliedJobs = JobStorage.getAppliedJobs();
+    if (appliedJobs.length === 0) {
+        document.getElementById('responseRate').textContent = '0%';
+        return;
+    }
+    
+
+    let responses = 0;
+    appliedJobs.forEach((_, index) => {
+        if (Math.random() < Math.max(0.3, 0.6 - (index * 0.1))) responses++;
+    });
+    
+    const rate = Math.round((responses / appliedJobs.length) * 100);
+    const element = document.getElementById('responseRate');
+    if (element) {
+        element.textContent = `${rate}%`;
+        element.style.color = rate < 20 ? '#ef4444' : rate < 50 ? '#f59e0b' : '#10b981';
+    }
+}
+
+function loadApplicationsList() {
+    const container = document.getElementById('applicationsList');
+    if (!container) return;
+    
+    const appliedJobs = JobStorage.getAppliedJobs();
     
     if (appliedJobs.length === 0) {
-        applicationsList.innerHTML = `
+        container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-file-alt"></i>
                 <p>No applications yet</p>
@@ -940,58 +509,50 @@ function loadApplicationsList() {
         return;
     }
     
-    let applicationsHTML = '';
-    const statusOptions = [
-        {type: 'pending', label: 'Under Review', days: '1-3'},
-        {type: 'viewed', label: 'Profile Viewed', days: '2-4'},
-        {type: 'interview', label: 'Interview Scheduled', days: '3-5'},
-        {type: 'accepted', label: 'Offer Received', days: '5-7'},
-        {type: 'rejected', label: 'Not Selected', days: '1-2'}
+    const statuses = [
+        { type: 'pending', label: 'Under Review' },
+        { type: 'viewed', label: 'Profile Viewed' },
+        { type: 'interview', label: 'Interview Scheduled' },
+        { type: 'accepted', label: 'Offer Received' },
+        { type: 'rejected', label: 'Not Selected' }
     ];
     
-    // Show most recent 5 applications
+    let html = '';
     appliedJobs.slice(-5).reverse().forEach((jobId, index) => {
-        const job = jobsData.find(j => j.id === jobId);
-        if (job) {
-            // Assign status (first gets better status for demo)
-            let status;
-            if (index === 0) {
-                status = statusOptions[2]; // Interview
-            } else if (index < 3) {
-                status = statusOptions[1]; // Viewed
-            } else {
-                status = statusOptions[Math.floor(Math.random() * 2)]; // Pending or Viewed
-            }
-            
-            applicationsHTML += `
-                <div class="application-item">
-                    <div class="application-info">
-                        <h4>${job.title}</h4>
-                        <p>${job.company} • Applied ${status.days} days ago</p>
-                    </div>
-                    <div class="application-actions">
-                        <span class="status status-${status.type}">${status.label}</span>
-                        <a href="./job-details.html?id=${job.id}" class="btn btn-icon" title="View Job">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </div>
+        const job = JOBS_DATA.find(j => j.id === jobId);
+        if (!job) return;
+        
+        const status = index === 0 ? statuses[2] : 
+                      index < 3 ? statuses[1] : 
+                      statuses[Math.floor(Math.random() * 2)];
+        
+        html += `
+            <div class="application-item">
+                <div class="application-info">
+                    <h4>${job.title}</h4>
+                    <p>${job.company} • Applied ${Math.floor(Math.random() * 7) + 1} days ago</p>
                 </div>
-            `;
-        }
+                <div class="application-actions">
+                    <span class="status status-${status.type}">${status.label}</span>
+                    <a href="./job-details.html?id=${job.id}" class="btn btn-icon" title="View Job">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </div>
+            </div>
+        `;
     });
     
-    applicationsList.innerHTML = applicationsHTML;
+    container.innerHTML = html;
 }
 
-// Load saved jobs list for dashboard
 function loadSavedJobsList() {
-    const savedJobsList = document.getElementById('savedJobsList');
-    if (!savedJobsList) return;
+    const container = document.getElementById('savedJobsList');
+    if (!container) return;
     
-    const savedJobs = getSavedJobs();
+    const savedJobs = JobStorage.getSavedJobs();
     
     if (savedJobs.length === 0) {
-        savedJobsList.innerHTML = `
+        container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-bookmark"></i>
                 <p>No saved jobs yet</p>
@@ -1001,472 +562,208 @@ function loadSavedJobsList() {
         return;
     }
     
-    let savedJobsHTML = '';
-    
-    // Show most recent 5 saved jobs
+    let html = '';
     savedJobs.slice(-5).reverse().forEach(jobId => {
-        const job = jobsData.find(j => j.id === jobId);
-        if (job) {
-            const daysAgo = Math.floor(Math.random() * 5) + 1;
-            
-            savedJobsHTML += `
-                <div class="saved-job-item">
-                    <div class="saved-job-info">
-                        <h4>${job.title}</h4>
-                        <p>${job.company} • ${job.location} • Saved ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago</p>
-                    </div>
-                    <div class="saved-job-actions">
-                        <button class="btn btn-icon unsave-btn" data-id="${job.id}" title="Remove from Saved">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <a href="./job-details.html?id=${job.id}" class="btn btn-icon" title="View Job">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                        <a href="./apply.html?id=${job.id}" class="btn btn-icon" title="Apply Now">
-                            <i class="fas fa-paper-plane"></i>
-                        </a>
-                    </div>
+        const job = JOBS_DATA.find(j => j.id === jobId);
+        if (!job) return;
+        
+        html += `
+            <div class="saved-job-item">
+                <div class="saved-job-info">
+                    <h4>${job.title}</h4>
+                    <p>${job.company} • ${job.location} • Saved ${Math.floor(Math.random() * 5) + 1} days ago</p>
                 </div>
-            `;
-        }
-    });
-    
-    savedJobsList.innerHTML = savedJobsHTML;
-    
-    // Add event listeners to unsave buttons
-    document.querySelectorAll('.unsave-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const jobId = parseInt(this.dataset.id);
-            if (confirm('Remove this job from your saved list?')) {
-                let savedJobs = getSavedJobs();
-                savedJobs = savedJobs.filter(id => id !== jobId);
-                localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
-                loadSavedJobsList(); // Refresh the list
-                updateDashboardStats(); // Update counts
-            }
-        });
-    });
-}
-
-// Update all dashboard statistics
-function updateDashboardStats() {
-    const appliedJobs = getAppliedJobs();
-    const savedJobs = getSavedJobs();
-    
-    // Update main stat cards
-    const statElements = [
-        {id: 'appliedCount', value: appliedJobs.length},
-        {id: 'savedCount', value: savedJobs.length}
-    ];
-    
-    statElements.forEach(stat => {
-        const element = document.getElementById(stat.id);
-        if (element) {
-            element.textContent = stat.value;
-        }
-    });
-    
-    // Calculate simulated stats
-    const viewedCount = Math.floor(Math.random() * 30) + appliedJobs.length;
-    const interviewsCount = Math.min(Math.floor(appliedJobs.length * 0.3), appliedJobs.length);
-    
-    // Update simulated stats
-    const simulatedElements = [
-        {id: 'viewedCount', value: viewedCount},
-        {id: 'interviewsCount', value: interviewsCount}
-    ];
-    
-    simulatedElements.forEach(stat => {
-        const element = document.getElementById(stat.id);
-        if (element) {
-            element.textContent = stat.value;
-        }
-    });
-    
-    // Update response rate
-    updateResponseRate();
-}
-
-// Update profile completion percentage
-function updateProfileCompletion() {
-    let completion = 40; // Base score
-    
-    // Check what user has completed
-    const userName = localStorage.getItem('userName');
-    const userEmail = localStorage.getItem('userEmail');
-    const appliedJobs = getAppliedJobs();
-    const savedJobs = getSavedJobs();
-    
-    if (userName && userName !== 'Demo User') completion += 20;
-    if (userEmail && userEmail !== 'demo@example.com') completion += 20;
-    if (appliedJobs.length > 0) completion += 10;
-    if (savedJobs.length > 0) completion += 10;
-    
-    // Cap at 100%
-    completion = Math.min(completion, 100);
-    
-    const completionElement = document.getElementById('profileCompletion');
-    if (completionElement) {
-        completionElement.textContent = `${completion}%`;
-        
-        // Color code based on completion
-        if (completion < 50) {
-            completionElement.style.color = '#ef4444'; // Red
-        } else if (completion < 80) {
-            completionElement.style.color = '#f59e0b'; // Amber
-        } else {
-            completionElement.style.color = '#10b981'; // Green
-        }
-    }
-}
-
-// Calculate and update response rate
-function updateResponseRate() {
-    const appliedJobs = getAppliedJobs();
-    if (appliedJobs.length === 0) {
-        const responseRateElement = document.getElementById('responseRate');
-        if (responseRateElement) {
-            responseRateElement.textContent = '0%';
-        }
-        return;
-    }
-    
-    // Simulate response rate (higher for recent applications)
-    let responses = 0;
-    appliedJobs.forEach((jobId, index) => {
-        // More recent applications have higher chance of response
-        const chance = Math.max(0.3, 0.6 - (index * 0.1));
-        if (Math.random() < chance) responses++;
-    });
-    
-    const responseRate = Math.round((responses / appliedJobs.length) * 100);
-    const responseRateElement = document.getElementById('responseRate');
-    
-    if (responseRateElement) {
-        responseRateElement.textContent = `${responseRate}%`;
-        
-        // Color code based on response rate
-        if (responseRate < 20) {
-            responseRateElement.style.color = '#ef4444'; // Red
-        } else if (responseRate < 50) {
-            responseRateElement.style.color = '#f59e0b'; // Amber
-        } else {
-            responseRateElement.style.color = '#10b981'; // Green
-        }
-    }
-}
-
-// Set time-based greeting
-function setTimeBasedGreeting() {
-    const hour = new Date().getHours();
-    let greeting;
-    
-    if (hour < 12) {
-        greeting = "Good morning";
-    } else if (hour < 18) {
-        greeting = "Good afternoon";
-    } else {
-        greeting = "Good evening";
-    }
-    
-    const userName = localStorage.getItem('userName') || 'there';
-    const welcomeElement = document.getElementById('welcomeMessage');
-    
-    if (welcomeElement) {
-        welcomeElement.textContent = `${greeting}, ${userName}!`;
-        
-        // Add motivational message based on time
-        const messages = [
-            "Ready to find your dream job today?",
-            "Great things are coming your way!",
-            "Your next opportunity awaits!",
-            "Stay positive and keep applying!"
-        ];
-        
-        const subMessage = messages[Math.floor(Math.random() * messages.length)];
-        welcomeElement.innerHTML += `<br><small style="font-weight:normal; opacity:0.8;">${subMessage}</small>`;
-    }
-}
-
-// Load activity timeline with sample data
-function loadActivityTimeline() {
-    const activityTimeline = document.getElementById('activityTimeline');
-    if (!activityTimeline) return;
-    
-    const activities = [
-        {
-            icon: 'fa-user-plus',
-            title: 'Profile Updated',
-            description: 'You updated your profile information',
-            time: 'Just now'
-        },
-        {
-            icon: 'fa-paper-plane',
-            title: 'Application Sent',
-            description: 'Applied for Frontend Developer position',
-            time: '2 hours ago'
-        },
-        {
-            icon: 'fa-bookmark',
-            title: 'Job Saved',
-            description: 'Saved Data Analyst role for later',
-            time: 'Yesterday'
-        },
-        {
-            icon: 'fa-search',
-            title: 'Job Search',
-            description: 'Searched for "remote developer" jobs',
-            time: '2 days ago'
-        }
-    ];
-    
-    let timelineHTML = '';
-    activities.forEach(activity => {
-        timelineHTML += `
-            <div class="activity-item">
-                <div class="activity-icon">
-                    <i class="fas ${activity.icon}"></i>
-                </div>
-                <div class="activity-content">
-                    <h5>${activity.title}</h5>
-                    <p>${activity.description}</p>
-                    <div class="activity-time">${activity.time}</div>
+                <div class="saved-job-actions">
+                    <button class="btn btn-icon unsave-btn" data-id="${job.id}" title="Remove from Saved">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <a href="./job-details.html?id=${job.id}" class="btn btn-icon" title="View Job">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
                 </div>
             </div>
         `;
     });
     
-    activityTimeline.innerHTML = timelineHTML;
+    container.innerHTML = html;
+    
+
+    container.querySelectorAll('.unsave-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const jobId = parseInt(btn.dataset.id);
+            if (confirm('Remove this job from your saved list?')) {
+                JobStorage.toggleSavedJob(jobId);
+                loadSavedJobsList();
+                updateDashboardStats();
+            }
+        });
+    });
 }
 
-// Setup dashboard-specific event listeners
+function loadActivityTimeline() {
+    const container = document.getElementById('activityTimeline');
+    if (!container) return;
+    
+    const activities = [
+        { icon: 'fa-user-plus', title: 'Profile Updated', description: 'You updated your profile information', time: 'Just now' },
+        { icon: 'fa-paper-plane', title: 'Application Sent', description: 'Applied for Frontend Developer position', time: '2 hours ago' },
+        { icon: 'fa-bookmark', title: 'Job Saved', description: 'Saved Data Analyst role for later', time: 'Yesterday' },
+        { icon: 'fa-search', title: 'Job Search', description: 'Searched for "remote developer" jobs', time: '2 days ago' }
+    ];
+    
+    container.innerHTML = activities.map(activity => `
+        <div class="activity-item">
+            <div class="activity-icon">
+                <i class="fas ${activity.icon}"></i>
+            </div>
+            <div class="activity-content">
+                <h5>${activity.title}</h5>
+                <p>${activity.description}</p>
+                <div class="activity-time">${activity.time}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
 function setupDashboardListeners() {
-    // Edit profile button
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    if (editProfileBtn) {
-        editProfileBtn.addEventListener('click', function() {
-            editUserProfile();
-        });
-    }
-    
-    // Upload resume button
-    const uploadResumeBtn = document.getElementById('uploadResumeBtn');
-    if (uploadResumeBtn) {
-        uploadResumeBtn.addEventListener('click', function() {
-            alert('Resume upload feature would open here. For this demo, your profile has been marked as "Resume Uploaded".');
-            // Simulate resume upload
-            localStorage.setItem('resumeUploaded', 'true');
-            updateProfileCompletion();
-        });
-    }
-    
-    // Update photo button
-    const updatePhotoBtn = document.getElementById('updatePhotoBtn');
-    if (updatePhotoBtn) {
-        updatePhotoBtn.addEventListener('click', function() {
-            alert('Profile photo update feature would be implemented here.');
-        });
-    }
-    
-    // Quick action cards
-    const actionCards = {
-        'buildResumeBtn': 'Resume builder would open here with templates and editing tools.',
-        'practiceInterviewBtn': 'Mock interview practice with AI feedback would start here.',
-        'networkBtn': 'Professional networking feature connecting you with industry experts.'
-    };
-    
-    Object.keys(actionCards).forEach(btnId => {
-        const button = document.getElementById(btnId);
-        if (button) {
-            button.addEventListener('click', function() {
-                alert(actionCards[btnId]);
-            });
-        }
+
+    document.getElementById('editProfileBtn')?.addEventListener('click', () => {
+        const newName = prompt('Enter your full name:', Storage.get('userName') || '');
+        if (!newName) return;
+        
+        const newEmail = prompt('Enter your email:', Storage.get('userEmail') || '');
+        if (!newEmail) return;
+        
+        Storage.set('userName', newName);
+        Storage.set('userEmail', newEmail);
+        updateDashboardProfile();
+        UI.showAlert('Profile updated successfully!', 'success');
     });
     
-    // Control buttons
-    const exportDataBtn = document.getElementById('exportDataBtn');
-    if (exportDataBtn) {
-        exportDataBtn.addEventListener('click', exportDashboardData);
-    }
-    
-    const printDashboardBtn = document.getElementById('printDashboardBtn');
-    if (printDashboardBtn) {
-        printDashboardBtn.addEventListener('click', function() {
-            window.print();
-        });
-    }
-    
-    const resetDemoBtn = document.getElementById('resetDemoBtn');
-    if (resetDemoBtn) {
-        resetDemoBtn.addEventListener('click', resetDashboardData);
-    }
-    
-    const helpBtn = document.getElementById('helpBtn');
-    if (helpBtn) {
-        helpBtn.addEventListener('click', function() {
-            showDashboardHelp();
-        });
-    }
-}
 
-// Edit user profile function
-function editUserProfile() {
-    const currentName = localStorage.getItem('userName') || '';
-    const currentEmail = localStorage.getItem('userEmail') || '';
-    
-    const newName = prompt('Enter your full name:', currentName);
-    if (newName === null) return; // User cancelled
-    
-    const newEmail = prompt('Enter your email address:', currentEmail);
-    if (newEmail === null) return; // User cancelled
-    
-    const newPhone = prompt('Enter your phone number:', '+1 (555) 123-4567');
-    const newLocation = prompt('Enter your location:', 'New York, NY');
-    
-    // Save to localStorage
-    localStorage.setItem('userName', newName);
-    localStorage.setItem('userEmail', newEmail);
-    if (newPhone) localStorage.setItem('userPhone', newPhone);
-    if (newLocation) localStorage.setItem('userLocation', newLocation);
-    
-    // Update display
-    loadDashboardProfile();
-    updateProfileCompletion();
-    
-    alert('Profile updated successfully!');
-}
-
-// Export dashboard data as JSON
-function exportDashboardData() {
-    const userData = {
-        userName: localStorage.getItem('userName'),
-        userEmail: localStorage.getItem('userEmail'),
-        appliedJobs: getAppliedJobs(),
-        savedJobs: getSavedJobs(),
-        memberSince: localStorage.getItem('memberSince') || new Date().toLocaleDateString(),
-        exportDate: new Date().toISOString(),
-        profileStats: {
-            applications: getAppliedJobs().length,
-            savedJobs: getSavedJobs().length,
-            profileCompletion: document.getElementById('profileCompletion')?.textContent || '0%',
-            responseRate: document.getElementById('responseRate')?.textContent || '0%'
-        }
-    };
-    
-    const dataStr = JSON.stringify(userData, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    const url = URL.createObjectURL(dataBlob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `jobportal-dashboard-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    alert('Dashboard data exported successfully!');
-}
-
-// Reset dashboard demo data
-function resetDashboardData() {
-    if (confirm('Are you sure you want to reset all demo data?\n\nThis will clear:\n• Your applications\n• Saved jobs\n• Profile information\n• All dashboard statistics')) {
-        // Clear all application and saved job data
-        localStorage.removeItem('appliedJobs');
-        localStorage.removeItem('savedJobs');
+    document.getElementById('exportDataBtn')?.addEventListener('click', () => {
+        const data = {
+            userName: Storage.get('userName'),
+            userEmail: Storage.get('userEmail'),
+            appliedJobs: JobStorage.getAppliedJobs(),
+            savedJobs: JobStorage.getSavedJobs(),
+            exportDate: new Date().toISOString()
+        };
         
-        // Reset profile to demo defaults
-        localStorage.setItem('userName', 'Demo User');
-        localStorage.setItem('userEmail', 'demo@example.com');
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `jobportal-data-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
         
-        // Set member since date to today
-        const today = new Date().toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-        });
-        localStorage.setItem('memberSince', today);
-        
-        alert('Demo data has been reset! Page will reload.');
-        location.reload();
-    }
-}
-
-// Show dashboard help
-function showDashboardHelp() {
-    const helpMessage = `
-        📊 DASHBOARD HELP GUIDE
-
-        🔹 PROFILE SECTION
-        • Click "Edit" to update your personal information
-        • Upload your resume (simulated in demo)
-        • Profile completion shows how complete your profile is
-
-        🔹 APPLICATIONS
-        • View all jobs you've applied to
-        • Track application status
-        • Click the eye icon to view job details
-
-        🔹 SAVED JOBS
-        • Jobs you've bookmarked for later
-        • Use trash icon to remove from saved list
-        • Use paper plane icon to apply directly
-
-        🔹 STATISTICS
-        • Applications Sent: Total jobs applied to
-        • Profile Views: How many times employers viewed your profile
-        • Saved Jobs: Number of jobs bookmarked
-        • Interviews: Interview invitations received
-
-        🔹 QUICK ACTIONS
-        • Find Jobs: Browse new opportunities
-        • Build Resume: Create/update your resume
-        • Practice Interview: Mock interview preparation
-        • Network: Connect with professionals
-
-        Need more help? This is a demo for a college project.
-    `;
+        UI.showAlert('Data exported successfully!', 'success');
+    });
     
-    alert(helpMessage);
-}
 
-// Initialize dashboard when DOM loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if we're on dashboard page
-    if (window.location.pathname.includes('dashboard.html') || 
-        document.querySelector('.dashboard')) {
-        console.log('Initializing dashboard...');
-        
-        // Load dashboard data
-        loadDashboard();
-        
-        // Set member since date if not set
-        if (!localStorage.getItem('memberSince')) {
+    document.getElementById('resetDemoBtn')?.addEventListener('click', () => {
+        if (confirm('Reset all demo data? This will clear all your applications and saved jobs.')) {
+            Storage.remove('appliedJobs');
+            Storage.remove('savedJobs');
+            Storage.set('userName', 'Demo User');
+            Storage.set('userEmail', 'demo@example.com');
+            
             const today = new Date().toLocaleDateString('en-US', {
                 month: 'long',
                 day: 'numeric',
                 year: 'numeric'
             });
-            localStorage.setItem('memberSince', today);
-            document.getElementById('memberSince').textContent = today;
-        } else {
-            document.getElementById('memberSince').textContent = localStorage.getItem('memberSince');
-        }
-        
-        // Update activity times periodically
-        setInterval(updateActivityTimes, 60000); // Every minute
-    }
-});
-
-// Update activity timestamps
-function updateActivityTimes() {
-    const timeElements = document.querySelectorAll('.activity-time');
-    timeElements.forEach(el => {
-        if (el.textContent === 'Just now') {
-            el.textContent = 'A few minutes ago';
-        } else if (el.textContent === 'A few minutes ago') {
-            el.textContent = 'Recently';
+            Storage.set('memberSince', today);
+            
+            setTimeout(() => location.reload(), 1000);
+            UI.showAlert('Demo data reset! Page will reload.', 'info');
         }
     });
 }
+
+
+function initializeApp() {
+
+    if (!Storage.get('appliedJobs')) Storage.set('appliedJobs', [2, 4]);
+    if (!Storage.get('savedJobs')) Storage.set('savedJobs', [1, 3]);
+    if (!Storage.get('userName')) Storage.set('userName', 'Demo User');
+    if (!Storage.get('userEmail')) Storage.set('userEmail', 'demo@example.com');
+    
+
+    document.querySelector('.mobile-menu')?.addEventListener('click', UI.toggleMobileMenu);
+    
+
+    document.querySelector('.search-box .btn')?.addEventListener('click', () => {
+        const keyword = document.querySelector('.search-box input:first-child')?.value || '';
+        const location = document.querySelector('.search-box input:last-child')?.value || '';
+        
+        if (keyword || location) {
+            UI.showAlert(`Searching for "${keyword}" jobs in "${location}"...`);
+            window.location.href = `./jobs.html?search=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
+        }
+    });
+    
+
+    document.getElementById('loginBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const userName = prompt('Enter your name:', Storage.get('userName') || '');
+        if (userName) {
+            Storage.set('userName', userName);
+            UI.showAlert(`Welcome back, ${userName}!`);
+            window.location.href = './dashboard.html';
+        }
+    });
+    
+    document.getElementById('registerBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const userName = prompt('Create a username:');
+        if (!userName) return;
+        
+        const userEmail = prompt('Enter your email:');
+        if (!userEmail) return;
+        
+        Storage.set('userName', userName);
+        Storage.set('userEmail', userEmail);
+        UI.showAlert(`Account created! Welcome ${userName}.`);
+        window.location.href = './dashboard.html';
+    });
+    
+
+    const currentPage = window.location.pathname;
+    
+    if (currentPage.includes('index.html') || currentPage === '/' || currentPage.endsWith('/')) {
+        loadFeaturedJobs();
+    } else if (currentPage.includes('jobs.html')) {
+        loadAllJobs();
+        setupFilters();
+    } else if (currentPage.includes('job-details.html')) {
+        loadJobDetails();
+    } else if (currentPage.includes('dashboard.html')) {
+        loadDashboard();
+    } else if (currentPage.includes('apply.html')) {
+        setupApplicationForm();
+    }
+    
+
+    setTimeout(() => {
+        const jobsGrid = document.querySelector('.jobs-grid');
+        if (jobsGrid && jobsGrid.children.length === 0) {
+            const manualBtn = document.createElement('button');
+            manualBtn.textContent = 'Load Jobs';
+            manualBtn.className = 'btn manual-load';
+            manualBtn.onclick = () => {
+                if (currentPage.includes('jobs.html')) loadAllJobs();
+                else loadFeaturedJobs();
+                manualBtn.remove();
+            };
+            jobsGrid.after(manualBtn);
+        }
+    }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+window.addEventListener('load', () => {
+    console.log('Page loaded:', window.location.href);
+});

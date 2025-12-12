@@ -1,4 +1,3 @@
-/* Reset & Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -64,7 +63,6 @@ body {
     background-color: #4b5563;
 }
 
-/* Header */
 .header {
     background-color: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -122,7 +120,6 @@ body {
     cursor: pointer;
 }
 
-/* Hero Section */
 .hero {
     background: linear-gradient(135deg, #2563eb, #3b82f6);
     color: white;
@@ -171,13 +168,11 @@ body {
     padding: 15px 30px;
 }
 
-/* Main Content */
 main {
     flex: 1;
     padding: 20px 0 40px;
 }
 
-/* Featured Jobs & Job Listings */
 .featured-jobs, .job-listings {
     padding: 40px 0;
 }
@@ -259,7 +254,6 @@ main {
     margin: 0 auto;
 }
 
-/* How It Works Section */
 .how-it-works {
     background-color: #f1f5f9;
     padding: 60px 0;
@@ -329,7 +323,6 @@ main {
     font-size: 16px;
 }
 
-/* Job Details Page */
 .job-detail-container {
     max-width: 800px;
     margin: 0 auto;
@@ -382,7 +375,6 @@ main {
     margin-top: 30px;
 }
 
-/* Application Form */
 .application-form {
     max-width: 600px;
     margin: 0 auto;
@@ -558,7 +550,7 @@ main {
     color: #6b7280;
 }
 
-/* Footer */
+
 .footer {
     background-color: #1f2937;
     color: white;
@@ -588,7 +580,7 @@ main {
     color: white;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
     .nav {
         display: none;
@@ -653,7 +645,7 @@ main {
         grid-template-columns: 1fr;
     }
 }
-/* Debug/Error Styling */
+
 .debug-info {
     background: #f0f0f0;
     padding: 10px;
@@ -663,7 +655,7 @@ main {
     font-size: 12px;
 }
 
-/* Ensure jobs grid is visible */
+
 .jobs-grid:empty::after {
     content: "Loading jobs...";
     display: block;
@@ -673,13 +665,12 @@ main {
     font-style: italic;
 }
 
-/* Make sure job cards are visible */
+
 .job-card {
     visibility: visible !important;
     opacity: 1 !important;
 }
 
-/* Manual load button */
 .manual-load {
     display: block;
     margin: 30px auto;

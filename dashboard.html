@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💼</text></svg>">
     <style>
-        /* ========== DASHBOARD REDESIGN ========== */
+
 
 .dashboard {
     padding: 20px 0 40px;
@@ -241,7 +241,7 @@
     border-radius: 50%;
 }
 
-/* Profile Section */
+
 .profile-section {
     display: grid;
     grid-template-columns: 1fr 2fr;
@@ -279,7 +279,7 @@
     flex-wrap: wrap;
 }
 
-/* Skills Section */
+
 .skills-list {
     display: flex;
     flex-wrap: wrap;
@@ -303,7 +303,7 @@
     opacity: 0.7;
 }
 
-/* Quick Stats */
+
 .quick-stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -331,7 +331,7 @@
     color: #6b7280;
 }
 
-/* Activity Timeline */
+
 .activity-timeline {
     margin-top: 20px;
 }
@@ -377,7 +377,7 @@
     margin-top: 5px;
 }
 
-/* Action Cards */
+
 .action-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -419,7 +419,7 @@
     font-size: 0.9rem;
 }
 
-/* Empty States */
+
 .empty-state {
     text-align: center;
     padding: 40px 20px;
@@ -436,7 +436,7 @@
     margin-bottom: 20px;
 }
 
-/* Responsive Adjustments */
+
 @media (max-width: 768px) {
     .profile-section {
         grid-template-columns: 1fr;
@@ -463,7 +463,7 @@
     </style>
 </head>
 <body>
-    <!-- HEADER -->
+
     <header class="header">
         <div class="container">
             <a href="index.html" class="logo">
@@ -482,12 +482,11 @@
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
+
     <main>
         <div class="container">
             <div class="dashboard">
-                <!-- Dashboard Header -->
-                <div class="dashboard-header">
+                    <div class="dashboard-header">
                     <h1>Dashboard Overview</h1>
                     <div class="user-welcome">
                         <h2 id="welcomeMessage">Welcome back!</h2>
@@ -495,7 +494,7 @@
                     </div>
                 </div>
 
-                <!-- Stats Cards -->
+
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <div class="stat-icon">
@@ -530,18 +529,18 @@
                     </div>
                 </div>
 
-                <!-- Main Dashboard Grid -->
+
                 <div class="dashboard-grid">
-                    <!-- Left Column: Applications & Activity -->
+
                     <div>
-                        <!-- Applications Card -->
+
                         <div class="dashboard-card">
                             <div class="dashboard-card-header">
                                 <h3>Recent Applications</h3>
                                 <a href="jobs.html" class="btn">Apply for More</a>
                             </div>
                             <div class="applications-list" id="applicationsList">
-                                <!-- Applications will be loaded here -->
+
                                 <div class="empty-state">
                                     <i class="fas fa-file-alt"></i>
                                     <p>No applications yet</p>
@@ -550,7 +549,7 @@
                             </div>
                         </div>
 
-                        <!-- Recent Activity -->
+
                         <div class="dashboard-card" style="margin-top: 30px;">
                             <div class="dashboard-card-header">
                                 <h3>Recent Activity</h3>
@@ -580,9 +579,9 @@
                         </div>
                     </div>
 
-                    <!-- Right Column: Profile & Saved Jobs -->
+
                     <div>
-                        <!-- Profile Card -->
+
                         <div class="dashboard-card">
                             <div class="dashboard-card-header">
                                 <h3>My Profile</h3>
@@ -622,7 +621,7 @@
                                 </div>
                             </div>
 
-                            <!-- Skills Section -->
+
                             <div style="margin-top: 25px;">
                                 <h4 style="margin-bottom: 15px; color: #1f2937;">Skills & Expertise</h4>
                                 <div class="skills-list" id="skillsList">
@@ -636,14 +635,14 @@
                             </div>
                         </div>
 
-                        <!-- Saved Jobs Card -->
+
                         <div class="dashboard-card" style="margin-top: 30px;">
                             <div class="dashboard-card-header">
                                 <h3>Saved Jobs</h3>
                                 <a href="jobs.html" class="btn">Browse More</a>
                             </div>
                             <div class="saved-jobs-list" id="savedJobsList">
-                                <!-- Saved jobs will be loaded here -->
+
                                 <div class="empty-state">
                                     <i class="fas fa-bookmark"></i>
                                     <p>No saved jobs yet</p>
@@ -654,7 +653,7 @@
                     </div>
                 </div>
 
-                <!-- Quick Action Cards -->
+
                 <div class="dashboard-card">
                     <div class="dashboard-card-header">
                         <h3>Quick Actions</h3>
@@ -724,15 +723,15 @@
 
     <script src="./js/script.js"></script>
     <script>
-        // Dashboard-specific JavaScript
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log("Dashboard loaded");
             
-            // Update header user name
+
             const userName = localStorage.getItem('userName') || 'User';
             document.getElementById('headerUserName').textContent = userName;
             
-            // Dashboard button functionality
+
             document.getElementById('editProfileBtn').addEventListener('click', function() {
                 const newName = prompt('Enter your name:', localStorage.getItem('userName') || '');
                 const newEmail = prompt('Enter your email:', localStorage.getItem('userEmail') || '');
@@ -769,7 +768,7 @@
                 alert('Profile photo update feature would be implemented here.');
             });
             
-            // Quick action cards
+   
             document.getElementById('buildResumeBtn').addEventListener('click', function() {
                 alert('Resume builder feature would open here. You could create and format your resume.');
             });
@@ -782,7 +781,7 @@
                 alert('Networking feature would connect you with other professionals and recruiters.');
             });
             
-            // Control buttons
+          
             document.getElementById('exportDataBtn').addEventListener('click', function() {
                 const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
                 const savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
@@ -824,7 +823,7 @@
                 alert('Dashboard Help:\n\n• Click on job cards to view details\n• Use the Edit Profile button to update your information\n• Save jobs you\'re interested in\n• Track your application status\n• Use Quick Actions for common tasks');
             });
             
-            // Add some sample skills if empty
+    
             const skillsList = document.getElementById('skillsList');
             if (skillsList.children.length === 0) {
                 const skills = ['JavaScript', 'HTML5', 'CSS3', 'React', 'Git', 'Communication', 'Problem Solving'];
@@ -833,7 +832,7 @@
                 ).join('');
             }
             
-            // Set member since date
+        
             if (!localStorage.getItem('memberSince')) {
                 const today = new Date().toLocaleDateString('en-US', {
                     month: 'long',
@@ -844,15 +843,15 @@
             }
             document.getElementById('memberSince').textContent = localStorage.getItem('memberSince');
             
-            // Calculate and set profile completion percentage
+        
             function calculateProfileCompletion() {
-                let completion = 75; // Base percentage
+                let completion = 75; 
                 const userName = localStorage.getItem('userName');
                 const userEmail = localStorage.getItem('userEmail');
                 
                 if (userName && userEmail) completion += 15;
                 
-                // Add more completion logic based on profile data
+      
                 const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
                 if (appliedJobs.length > 0) completion += 10;
                 
@@ -861,12 +860,12 @@
             
             document.getElementById('profileCompletion').textContent = `${calculateProfileCompletion()}%`;
             
-            // Calculate response rate
+   
             function calculateResponseRate() {
                 const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
                 if (appliedJobs.length === 0) return "0%";
                 
-                // Simulate some responses for demo
+
                 const responses = Math.min(Math.floor(appliedJobs.length * 0.4), appliedJobs.length);
                 const rate = Math.floor((responses / appliedJobs.length) * 100);
                 return `${rate}%`;
@@ -874,7 +873,7 @@
             
             document.getElementById('responseRate').textContent = calculateResponseRate();
             
-            // Set welcome message with time of day
+        
             function setWelcomeMessage() {
                 const hour = new Date().getHours();
                 let greeting;
@@ -889,20 +888,20 @@
             
             setWelcomeMessage();
             
-            // Update stats that aren't covered by main script
+
             function updateDashboardStats() {
                 const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
                 const savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
                 
-                // Calculate viewed count (simulated)
+
                 const viewedCount = Math.floor(Math.random() * 50) + 10;
                 document.getElementById('viewedCount').textContent = viewedCount;
                 
-                // Calculate interviews (simulated)
+   
                 const interviews = Math.min(Math.floor(appliedJobs.length * 0.3), 5);
                 document.getElementById('interviewsCount').textContent = interviews;
                 
-                // Update welcome message with stats
+              
                 const welcomeEl = document.getElementById('welcomeMessage');
                 if (appliedJobs.length > 0) {
                     welcomeEl.innerHTML = `${welcomeEl.textContent} <small style="opacity:0.7;">(${appliedJobs.length} applications sent)</small>`;
@@ -911,7 +910,7 @@
             
             updateDashboardStats();
             
-            // Add real-time update for activity timeline
+      
             setInterval(() => {
                 const activityTimes = document.querySelectorAll('.activity-time');
                 activityTimes.forEach(el => {
@@ -919,7 +918,7 @@
                         el.textContent = 'A few minutes ago';
                     }
                 });
-            }, 60000); // Update every minute
+            }, 60000); 
         });
     </script>
 </body>
