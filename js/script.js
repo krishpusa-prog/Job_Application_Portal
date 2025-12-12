@@ -733,3 +733,740 @@ window.addEventListener('load', function() {
         }
     }, 1000);
 });
+// Dashboard-specific functions
+function updateDashboardStats() {
+    const appliedJobs = getAppliedJobs();
+    const savedJobs = getSavedJobs();
+    
+    // Update counts
+    const appliedCountEl = document.getElementById('appliedCount');
+    const savedCountEl = document.getElementById('savedCount');
+    
+    if (appliedCountEl) appliedCountEl.textContent = appliedJobs.length;
+    if (savedCountEl) savedCountEl.textContent = savedJobs.length;
+    
+    // Calculate other stats (simulated)
+    const viewedCount = Math.floor(Math.random() * 50) + 10;
+    const interviewsCount = Math.min(Math.floor(appliedJobs.length * 0.3), 5);
+    
+    const viewedCountEl = document.getElementById('viewedCount');
+    const interviewsCountEl = document.getElementById('interviewsCount');
+    
+    if (viewedCountEl) viewedCountEl.textContent = viewedCount;
+    if (interviewsCountEl) interviewsCountEl.textContent = interviewsCount;
+}
+
+function loadApplicationsList() {
+    const applicationsList = document.getElementById('applicationsList');
+    if (!applicationsList) return;
+    
+    const appliedJobs = getAppliedJobs();
+    
+    if (appliedJobs.length === 0) {
+        applicationsList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-file-alt"></i>
+                <p>No applications yet</p>
+                <a href="./jobs.html" class="btn">Browse Jobs</a>
+            </div>
+        `;
+        return;
+    }
+    
+    let applicationsHTML = '';
+    const statuses = ['pending', 'viewed', 'rejected', 'accepted', 'interview'];
+    const statusLabels = {
+        'pending': 'Pending Review',
+        'viewed': 'Viewed',
+        'rejected': 'Not Selected',
+        'accepted': 'Accepted',
+        'interview': 'Interview Scheduled'
+    };
+    
+    // Get the 5 most recent applications (based on demo data)
+    appliedJobs.slice(-5).reverse().forEach(jobId => {
+        const job = jobsData.find(j => j.id === jobId);
+        if (job) {
+            // Assign random status for demo
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            const daysAgo = Math.floor(Math.random() * 7) + 1;
+            
+            applicationsHTML += `
+                <div class="application-item">
+                    <div class="application-info">
+                        <h4>${job.title}</h4>
+                        <p>${job.company} • Applied ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago</p>
+                    </div>
+                    <div class="application-actions">
+                        <span class="status status-${randomStatus}">${statusLabels[randomStatus]}</span>
+                        <a href="./job-details.html?id=${job.id}" class="btn btn-icon">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    applicationsList.innerHTML = applicationsHTML;
+}
+
+function loadSavedJobsList() {
+    const savedJobsList = document.getElementById('savedJobsList');
+    if (!savedJobsList) return;
+    
+    const savedJobs = getSavedJobs();
+    
+    if (savedJobs.length === 0) {
+        savedJobsList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-bookmark"></i>
+                <p>No saved jobs yet</p>
+                <a href="./jobs.html" class="btn">Browse Jobs</a>
+            </div>
+        `;
+        return;
+    }
+    
+    let savedJobsHTML = '';
+    
+    // Get the 5 most recent saved jobs
+    savedJobs.slice(-5).reverse().forEach(jobId => {
+        const job = jobsData.find(j => j.id === jobId);
+        if (job) {
+            const daysAgo = Math.floor(Math.random() * 5) + 1;
+            
+            savedJobsHTML += `
+                <div class="saved-job-item">
+                    <div class="saved-job-info">
+                        <h4>${job.title}</h4>
+                        <p>${job.company} • ${job.location} • Saved ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago</p>
+                    </div>
+                    <div class="saved-job-actions">
+                        <button class="btn btn-icon unsave-btn" data-id="${job.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <a href="./job-details.html?id=${job.id}" class="btn btn-icon">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    savedJobsList.innerHTML = savedJobsHTML;
+    
+    // Add event listeners to unsave buttons
+    document.querySelectorAll('.unsave-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const jobId = parseInt(this.dataset.id);
+            if (confirm('Remove this job from saved list?')) {
+                toggleSaveJob(jobId, null);
+                loadSavedJobsList();
+            }
+        });
+    });
+}
+
+// ========== DASHBOARD FUNCTIONS ==========
+
+// Load dashboard data
+function loadDashboard() {
+    console.log("Loading dashboard...");
+    
+    // Load profile information
+    loadDashboardProfile();
+    
+    // Load applications list
+    loadApplicationsList();
+    
+    // Load saved jobs list
+    loadSavedJobsList();
+    
+    // Update all dashboard statistics
+    updateDashboardStats();
+    
+    // Set up dashboard-specific event listeners
+    setupDashboardListeners();
+    
+    // Add sample activity timeline
+    loadActivityTimeline();
+}
+
+// Load and display user profile information
+function loadDashboardProfile() {
+    const userName = localStorage.getItem('userName') || 'Job Seeker';
+    const userEmail = localStorage.getItem('userEmail') || 'Click Edit to add email';
+    
+    // Update all profile elements
+    const profileElements = [
+        {id: 'profileName', text: userName},
+        {id: 'profileEmail', text: userEmail},
+        {id: 'welcomeMessage', text: `Welcome back, ${userName}!`},
+        {id: 'userEmailDisplay', text: userEmail},
+        {id: 'headerUserName', text: userName}
+    ];
+    
+    profileElements.forEach(item => {
+        const element = document.getElementById(item.id);
+        if (element) {
+            element.textContent = item.text;
+        }
+    });
+    
+    // Set time-based greeting
+    setTimeBasedGreeting();
+    
+    // Calculate and display profile completion
+    updateProfileCompletion();
+}
+
+// Load applications list for dashboard
+function loadApplicationsList() {
+    const applicationsList = document.getElementById('applicationsList');
+    if (!applicationsList) return;
+    
+    const appliedJobs = getAppliedJobs();
+    
+    if (appliedJobs.length === 0) {
+        applicationsList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-file-alt"></i>
+                <p>No applications yet</p>
+                <a href="./jobs.html" class="btn">Browse Jobs</a>
+            </div>
+        `;
+        return;
+    }
+    
+    let applicationsHTML = '';
+    const statusOptions = [
+        {type: 'pending', label: 'Under Review', days: '1-3'},
+        {type: 'viewed', label: 'Profile Viewed', days: '2-4'},
+        {type: 'interview', label: 'Interview Scheduled', days: '3-5'},
+        {type: 'accepted', label: 'Offer Received', days: '5-7'},
+        {type: 'rejected', label: 'Not Selected', days: '1-2'}
+    ];
+    
+    // Show most recent 5 applications
+    appliedJobs.slice(-5).reverse().forEach((jobId, index) => {
+        const job = jobsData.find(j => j.id === jobId);
+        if (job) {
+            // Assign status (first gets better status for demo)
+            let status;
+            if (index === 0) {
+                status = statusOptions[2]; // Interview
+            } else if (index < 3) {
+                status = statusOptions[1]; // Viewed
+            } else {
+                status = statusOptions[Math.floor(Math.random() * 2)]; // Pending or Viewed
+            }
+            
+            applicationsHTML += `
+                <div class="application-item">
+                    <div class="application-info">
+                        <h4>${job.title}</h4>
+                        <p>${job.company} • Applied ${status.days} days ago</p>
+                    </div>
+                    <div class="application-actions">
+                        <span class="status status-${status.type}">${status.label}</span>
+                        <a href="./job-details.html?id=${job.id}" class="btn btn-icon" title="View Job">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    applicationsList.innerHTML = applicationsHTML;
+}
+
+// Load saved jobs list for dashboard
+function loadSavedJobsList() {
+    const savedJobsList = document.getElementById('savedJobsList');
+    if (!savedJobsList) return;
+    
+    const savedJobs = getSavedJobs();
+    
+    if (savedJobs.length === 0) {
+        savedJobsList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-bookmark"></i>
+                <p>No saved jobs yet</p>
+                <a href="./jobs.html" class="btn">Save Jobs</a>
+            </div>
+        `;
+        return;
+    }
+    
+    let savedJobsHTML = '';
+    
+    // Show most recent 5 saved jobs
+    savedJobs.slice(-5).reverse().forEach(jobId => {
+        const job = jobsData.find(j => j.id === jobId);
+        if (job) {
+            const daysAgo = Math.floor(Math.random() * 5) + 1;
+            
+            savedJobsHTML += `
+                <div class="saved-job-item">
+                    <div class="saved-job-info">
+                        <h4>${job.title}</h4>
+                        <p>${job.company} • ${job.location} • Saved ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago</p>
+                    </div>
+                    <div class="saved-job-actions">
+                        <button class="btn btn-icon unsave-btn" data-id="${job.id}" title="Remove from Saved">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <a href="./job-details.html?id=${job.id}" class="btn btn-icon" title="View Job">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        <a href="./apply.html?id=${job.id}" class="btn btn-icon" title="Apply Now">
+                            <i class="fas fa-paper-plane"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    savedJobsList.innerHTML = savedJobsHTML;
+    
+    // Add event listeners to unsave buttons
+    document.querySelectorAll('.unsave-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const jobId = parseInt(this.dataset.id);
+            if (confirm('Remove this job from your saved list?')) {
+                let savedJobs = getSavedJobs();
+                savedJobs = savedJobs.filter(id => id !== jobId);
+                localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+                loadSavedJobsList(); // Refresh the list
+                updateDashboardStats(); // Update counts
+            }
+        });
+    });
+}
+
+// Update all dashboard statistics
+function updateDashboardStats() {
+    const appliedJobs = getAppliedJobs();
+    const savedJobs = getSavedJobs();
+    
+    // Update main stat cards
+    const statElements = [
+        {id: 'appliedCount', value: appliedJobs.length},
+        {id: 'savedCount', value: savedJobs.length}
+    ];
+    
+    statElements.forEach(stat => {
+        const element = document.getElementById(stat.id);
+        if (element) {
+            element.textContent = stat.value;
+        }
+    });
+    
+    // Calculate simulated stats
+    const viewedCount = Math.floor(Math.random() * 30) + appliedJobs.length;
+    const interviewsCount = Math.min(Math.floor(appliedJobs.length * 0.3), appliedJobs.length);
+    
+    // Update simulated stats
+    const simulatedElements = [
+        {id: 'viewedCount', value: viewedCount},
+        {id: 'interviewsCount', value: interviewsCount}
+    ];
+    
+    simulatedElements.forEach(stat => {
+        const element = document.getElementById(stat.id);
+        if (element) {
+            element.textContent = stat.value;
+        }
+    });
+    
+    // Update response rate
+    updateResponseRate();
+}
+
+// Update profile completion percentage
+function updateProfileCompletion() {
+    let completion = 40; // Base score
+    
+    // Check what user has completed
+    const userName = localStorage.getItem('userName');
+    const userEmail = localStorage.getItem('userEmail');
+    const appliedJobs = getAppliedJobs();
+    const savedJobs = getSavedJobs();
+    
+    if (userName && userName !== 'Demo User') completion += 20;
+    if (userEmail && userEmail !== 'demo@example.com') completion += 20;
+    if (appliedJobs.length > 0) completion += 10;
+    if (savedJobs.length > 0) completion += 10;
+    
+    // Cap at 100%
+    completion = Math.min(completion, 100);
+    
+    const completionElement = document.getElementById('profileCompletion');
+    if (completionElement) {
+        completionElement.textContent = `${completion}%`;
+        
+        // Color code based on completion
+        if (completion < 50) {
+            completionElement.style.color = '#ef4444'; // Red
+        } else if (completion < 80) {
+            completionElement.style.color = '#f59e0b'; // Amber
+        } else {
+            completionElement.style.color = '#10b981'; // Green
+        }
+    }
+}
+
+// Calculate and update response rate
+function updateResponseRate() {
+    const appliedJobs = getAppliedJobs();
+    if (appliedJobs.length === 0) {
+        const responseRateElement = document.getElementById('responseRate');
+        if (responseRateElement) {
+            responseRateElement.textContent = '0%';
+        }
+        return;
+    }
+    
+    // Simulate response rate (higher for recent applications)
+    let responses = 0;
+    appliedJobs.forEach((jobId, index) => {
+        // More recent applications have higher chance of response
+        const chance = Math.max(0.3, 0.6 - (index * 0.1));
+        if (Math.random() < chance) responses++;
+    });
+    
+    const responseRate = Math.round((responses / appliedJobs.length) * 100);
+    const responseRateElement = document.getElementById('responseRate');
+    
+    if (responseRateElement) {
+        responseRateElement.textContent = `${responseRate}%`;
+        
+        // Color code based on response rate
+        if (responseRate < 20) {
+            responseRateElement.style.color = '#ef4444'; // Red
+        } else if (responseRate < 50) {
+            responseRateElement.style.color = '#f59e0b'; // Amber
+        } else {
+            responseRateElement.style.color = '#10b981'; // Green
+        }
+    }
+}
+
+// Set time-based greeting
+function setTimeBasedGreeting() {
+    const hour = new Date().getHours();
+    let greeting;
+    
+    if (hour < 12) {
+        greeting = "Good morning";
+    } else if (hour < 18) {
+        greeting = "Good afternoon";
+    } else {
+        greeting = "Good evening";
+    }
+    
+    const userName = localStorage.getItem('userName') || 'there';
+    const welcomeElement = document.getElementById('welcomeMessage');
+    
+    if (welcomeElement) {
+        welcomeElement.textContent = `${greeting}, ${userName}!`;
+        
+        // Add motivational message based on time
+        const messages = [
+            "Ready to find your dream job today?",
+            "Great things are coming your way!",
+            "Your next opportunity awaits!",
+            "Stay positive and keep applying!"
+        ];
+        
+        const subMessage = messages[Math.floor(Math.random() * messages.length)];
+        welcomeElement.innerHTML += `<br><small style="font-weight:normal; opacity:0.8;">${subMessage}</small>`;
+    }
+}
+
+// Load activity timeline with sample data
+function loadActivityTimeline() {
+    const activityTimeline = document.getElementById('activityTimeline');
+    if (!activityTimeline) return;
+    
+    const activities = [
+        {
+            icon: 'fa-user-plus',
+            title: 'Profile Updated',
+            description: 'You updated your profile information',
+            time: 'Just now'
+        },
+        {
+            icon: 'fa-paper-plane',
+            title: 'Application Sent',
+            description: 'Applied for Frontend Developer position',
+            time: '2 hours ago'
+        },
+        {
+            icon: 'fa-bookmark',
+            title: 'Job Saved',
+            description: 'Saved Data Analyst role for later',
+            time: 'Yesterday'
+        },
+        {
+            icon: 'fa-search',
+            title: 'Job Search',
+            description: 'Searched for "remote developer" jobs',
+            time: '2 days ago'
+        }
+    ];
+    
+    let timelineHTML = '';
+    activities.forEach(activity => {
+        timelineHTML += `
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas ${activity.icon}"></i>
+                </div>
+                <div class="activity-content">
+                    <h5>${activity.title}</h5>
+                    <p>${activity.description}</p>
+                    <div class="activity-time">${activity.time}</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    activityTimeline.innerHTML = timelineHTML;
+}
+
+// Setup dashboard-specific event listeners
+function setupDashboardListeners() {
+    // Edit profile button
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', function() {
+            editUserProfile();
+        });
+    }
+    
+    // Upload resume button
+    const uploadResumeBtn = document.getElementById('uploadResumeBtn');
+    if (uploadResumeBtn) {
+        uploadResumeBtn.addEventListener('click', function() {
+            alert('Resume upload feature would open here. For this demo, your profile has been marked as "Resume Uploaded".');
+            // Simulate resume upload
+            localStorage.setItem('resumeUploaded', 'true');
+            updateProfileCompletion();
+        });
+    }
+    
+    // Update photo button
+    const updatePhotoBtn = document.getElementById('updatePhotoBtn');
+    if (updatePhotoBtn) {
+        updatePhotoBtn.addEventListener('click', function() {
+            alert('Profile photo update feature would be implemented here.');
+        });
+    }
+    
+    // Quick action cards
+    const actionCards = {
+        'buildResumeBtn': 'Resume builder would open here with templates and editing tools.',
+        'practiceInterviewBtn': 'Mock interview practice with AI feedback would start here.',
+        'networkBtn': 'Professional networking feature connecting you with industry experts.'
+    };
+    
+    Object.keys(actionCards).forEach(btnId => {
+        const button = document.getElementById(btnId);
+        if (button) {
+            button.addEventListener('click', function() {
+                alert(actionCards[btnId]);
+            });
+        }
+    });
+    
+    // Control buttons
+    const exportDataBtn = document.getElementById('exportDataBtn');
+    if (exportDataBtn) {
+        exportDataBtn.addEventListener('click', exportDashboardData);
+    }
+    
+    const printDashboardBtn = document.getElementById('printDashboardBtn');
+    if (printDashboardBtn) {
+        printDashboardBtn.addEventListener('click', function() {
+            window.print();
+        });
+    }
+    
+    const resetDemoBtn = document.getElementById('resetDemoBtn');
+    if (resetDemoBtn) {
+        resetDemoBtn.addEventListener('click', resetDashboardData);
+    }
+    
+    const helpBtn = document.getElementById('helpBtn');
+    if (helpBtn) {
+        helpBtn.addEventListener('click', function() {
+            showDashboardHelp();
+        });
+    }
+}
+
+// Edit user profile function
+function editUserProfile() {
+    const currentName = localStorage.getItem('userName') || '';
+    const currentEmail = localStorage.getItem('userEmail') || '';
+    
+    const newName = prompt('Enter your full name:', currentName);
+    if (newName === null) return; // User cancelled
+    
+    const newEmail = prompt('Enter your email address:', currentEmail);
+    if (newEmail === null) return; // User cancelled
+    
+    const newPhone = prompt('Enter your phone number:', '+1 (555) 123-4567');
+    const newLocation = prompt('Enter your location:', 'New York, NY');
+    
+    // Save to localStorage
+    localStorage.setItem('userName', newName);
+    localStorage.setItem('userEmail', newEmail);
+    if (newPhone) localStorage.setItem('userPhone', newPhone);
+    if (newLocation) localStorage.setItem('userLocation', newLocation);
+    
+    // Update display
+    loadDashboardProfile();
+    updateProfileCompletion();
+    
+    alert('Profile updated successfully!');
+}
+
+// Export dashboard data as JSON
+function exportDashboardData() {
+    const userData = {
+        userName: localStorage.getItem('userName'),
+        userEmail: localStorage.getItem('userEmail'),
+        appliedJobs: getAppliedJobs(),
+        savedJobs: getSavedJobs(),
+        memberSince: localStorage.getItem('memberSince') || new Date().toLocaleDateString(),
+        exportDate: new Date().toISOString(),
+        profileStats: {
+            applications: getAppliedJobs().length,
+            savedJobs: getSavedJobs().length,
+            profileCompletion: document.getElementById('profileCompletion')?.textContent || '0%',
+            responseRate: document.getElementById('responseRate')?.textContent || '0%'
+        }
+    };
+    
+    const dataStr = JSON.stringify(userData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `jobportal-dashboard-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('Dashboard data exported successfully!');
+}
+
+// Reset dashboard demo data
+function resetDashboardData() {
+    if (confirm('Are you sure you want to reset all demo data?\n\nThis will clear:\n• Your applications\n• Saved jobs\n• Profile information\n• All dashboard statistics')) {
+        // Clear all application and saved job data
+        localStorage.removeItem('appliedJobs');
+        localStorage.removeItem('savedJobs');
+        
+        // Reset profile to demo defaults
+        localStorage.setItem('userName', 'Demo User');
+        localStorage.setItem('userEmail', 'demo@example.com');
+        
+        // Set member since date to today
+        const today = new Date().toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+        localStorage.setItem('memberSince', today);
+        
+        alert('Demo data has been reset! Page will reload.');
+        location.reload();
+    }
+}
+
+// Show dashboard help
+function showDashboardHelp() {
+    const helpMessage = `
+        📊 DASHBOARD HELP GUIDE
+
+        🔹 PROFILE SECTION
+        • Click "Edit" to update your personal information
+        • Upload your resume (simulated in demo)
+        • Profile completion shows how complete your profile is
+
+        🔹 APPLICATIONS
+        • View all jobs you've applied to
+        • Track application status
+        • Click the eye icon to view job details
+
+        🔹 SAVED JOBS
+        • Jobs you've bookmarked for later
+        • Use trash icon to remove from saved list
+        • Use paper plane icon to apply directly
+
+        🔹 STATISTICS
+        • Applications Sent: Total jobs applied to
+        • Profile Views: How many times employers viewed your profile
+        • Saved Jobs: Number of jobs bookmarked
+        • Interviews: Interview invitations received
+
+        🔹 QUICK ACTIONS
+        • Find Jobs: Browse new opportunities
+        • Build Resume: Create/update your resume
+        • Practice Interview: Mock interview preparation
+        • Network: Connect with professionals
+
+        Need more help? This is a demo for a college project.
+    `;
+    
+    alert(helpMessage);
+}
+
+// Initialize dashboard when DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we're on dashboard page
+    if (window.location.pathname.includes('dashboard.html') || 
+        document.querySelector('.dashboard')) {
+        console.log('Initializing dashboard...');
+        
+        // Load dashboard data
+        loadDashboard();
+        
+        // Set member since date if not set
+        if (!localStorage.getItem('memberSince')) {
+            const today = new Date().toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            localStorage.setItem('memberSince', today);
+            document.getElementById('memberSince').textContent = today;
+        } else {
+            document.getElementById('memberSince').textContent = localStorage.getItem('memberSince');
+        }
+        
+        // Update activity times periodically
+        setInterval(updateActivityTimes, 60000); // Every minute
+    }
+});
+
+// Update activity timestamps
+function updateActivityTimes() {
+    const timeElements = document.querySelectorAll('.activity-time');
+    timeElements.forEach(el => {
+        if (el.textContent === 'Just now') {
+            el.textContent = 'A few minutes ago';
+        } else if (el.textContent === 'A few minutes ago') {
+            el.textContent = 'Recently';
+        }
+    });
+}
