@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobPortal - Find Your Dream Job</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💼</text></svg>">
+    <style>
+
+        .home-hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+            color: white;
+            padding: 100px 0 80px;
+            position: relative;
+            overflow: hidden;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .home-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .hero-text {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .hero-text h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-text p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+        
+        .hero-badges {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .hero-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .hero-badge i {
+            color: #60a5fa;
+        }
+        
+        .hero-search {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        
+        .search-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .search-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        
+        .search-inputs {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-inputs input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-inputs input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .search-advanced {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .search-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .search-tag {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-tag:hover {
+            background: #3730a3;
+            color: white;
+        }
+        
+        .stats-section {
+            padding: 80px 0;
+            background: #f8fafc;
+            position: relative;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            text-align: center;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+        }
+        
+        .stat-number {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+        
+
+        .featured-jobs-section {
+            padding: 100px 0;
+            background: white;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.8rem;
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+        
+        .section-header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .jobs-grid-featured {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .job-card-featured {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .job-card-featured:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border-color: #2563eb;
+        }
+        
+        .job-featured-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 1;
+        }
+        
+        .job-card-content {
+            padding: 30px;
+        }
+        
+        .job-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .company-logo-home {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        
+        .job-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.3rem;
+            color: #1f2937;
+        }
+        
+        .job-info p {
+            margin: 0 0 10px 0;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        
+        .job-tags-home {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .job-tag-home {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .job-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .job-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #4b5563;
+        }
+        
+        .job-detail-item i {
+            color: #9ca3af;
+        }
+        
+        .view-all-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+
+        .how-it-works-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+        
+        .step-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4f46e5;
+            font-size: 2.2rem;
+        }
+        
+        .step-card h3 {
+            margin: 0 0 15px 0;
+            color: #1f2937;
+            font-size: 1.4rem;
+        }
+        
+        .step-card p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+
+        .companies-section {
+            padding: 100px 0;
+            background: white;
+        }
+        
+        .companies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .company-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .company-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: #2563eb;
+        }
+        
+        .company-logo-large {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .company-info h4 {
+            margin: 0 0 10px 0;
+            color: #1f2937;
+            font-size: 1.2rem;
+        }
+        
+        .company-info p {
+            color: #6b7280;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .company-jobs {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(255,255,255,0.05)" d="M0,0 L100,0 L100,100 Z"></path></svg>');
+            background-size: cover;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-content h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        
+        .cta-content p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+
+        @media (max-width: 1200px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .hero-text h1 {
+                font-size: 3.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .home-hero {
+                padding: 80px 0 60px;
+                min-height: auto;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-text p {
+                font-size: 1.1rem;
+            }
+            
+            .search-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-advanced {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+            
+            .search-tags {
+                justify-content: center;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .section-header h2 {
+                font-size: 2.2rem;
+            }
+            
+            .jobs-grid-featured {
+                grid-template-columns: 1fr;
+            }
+            
+            .steps-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .companies-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .cta-content h2 {
+                font-size: 2.2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .companies-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-badges {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-briefcase"></i>
+                <span>JobPortal</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html" class="active">Home</a>
+                <a href="jobs.html">Find Jobs</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="#" id="loginBtn">Login</a>
+                <a href="#" id="registerBtn" class="btn">Sign Up Free</a>
+            </nav>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+
+    <section class="home-hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Find Your Dream Job With Ease</h1>
+                    <p>Connect with top employers, discover opportunities that match your skills, and take the next step in your career journey. Thousands of jobs waiting for you.</p>
+                    
+                    <div class="hero-badges">
+                        <div class="hero-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>5,000+ Companies</span>
+                        </div>
+                        <div class="hero-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>50,000+ Jobs</span>
+                        </div>
+                        <div class="hero-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>90% Success Rate</span>
+                        </div>
+                    </div>
+                    
+                    <div class="cta-buttons">
+                        <a href="jobs.html" class="btn" style="background: white; color: #2563eb; padding: 15px 30px; font-size: 1.1rem;">
+                            <i class="fas fa-search"></i> Browse Jobs
+                        </a>
+                        <a href="#" id="registerHeroBtn" class="btn btn-secondary" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 15px 30px; font-size: 1.1rem;">
+                            <i class="fas fa-user-plus"></i> Post a Job
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="hero-search">
+                    <div class="search-tabs">
+                        <button class="search-tab active">Find a Job</button>
+                        <button class="search-tab">Find Talent</button>
+                    </div>
+                    
+                    <div class="search-inputs">
+                        <input type="text" placeholder="Job title, keyword, or company" id="homeSearch">
+                        <input type="text" placeholder="City, state, or remote" id="homeLocation">
+                    </div>
+                    
+                    <button class="btn" style="width: 100%; padding: 16px; font-size: 1.1rem;" id="homeSearchBtn">
+                        <i class="fas fa-search"></i> Search Jobs
+                    </button>
+                    
+                    <div class="search-advanced">
+                        <div class="search-tags">
+                            <span class="search-tag" data-job="developer">Developer</span>
+                            <span class="search-tag" data-job="designer">Designer</span>
+                            <span class="search-tag" data-job="marketing">Marketing</span>
+                            <span class="search-tag" data-job="remote">Remote</span>
+                        </div>
+                        <a href="jobs.html" style="color: #2563eb; font-weight: 600; text-decoration: none;">
+                            Advanced Search <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <span class="stat-number" id="statsJobs">50,000+</span>
+                    <span class="stat-label">Active Jobs</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <span class="stat-number" id="statsCompanies">5,000+</span>
+                    <span class="stat-label">Companies</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <span class="stat-number" id="statsHired">10,000+</span>
+                    <span class="stat-label">People Hired</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <span class="stat-number" id="statsCountries">100+</span>
+                    <span class="stat-label">Countries</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="featured-jobs-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Jobs</h2>
+                <p>Discover hand-picked opportunities from top companies</p>
+            </div>
+            
+            <div class="jobs-grid-featured" id="featuredJobsGrid">
+
+                <div class="loading-jobs">
+                    <div class="job-card-featured">
+                        <div class="job-card-content">
+                            <div class="loading-placeholder" style="height: 200px; background: #f3f4f6; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+                    <div class="job-card-featured">
+                        <div class="job-card-content">
+                            <div class="loading-placeholder" style="height: 200px; background: #f3f4f6; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+                    <div class="job-card-featured">
+                        <div class="job-card-content">
+                            <div class="loading-placeholder" style="height: 200px; background: #f3f4f6; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="view-all-container">
+                <a href="jobs.html" class="btn" style="padding: 15px 40px; font-size: 1.1rem;">
+                    <i class="fas fa-search"></i> View All Jobs
+                </a>
+            </div>
+        </div>
+    </section>
+
+  
+    <section class="how-it-works-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>How JobPortal Works</h2>
+                <p>Get your dream job in just 4 simple steps</p>
+            </div>
+            
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Create Your Profile</h3>
+                    <p>Sign up and build your professional profile with skills, experience, and portfolio.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Find Perfect Jobs</h3>
+                    <p>Use advanced filters to find jobs that match your skills and preferences.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h3>Apply Easily</h3>
+                    <p>Apply to jobs with one click using your saved profile and resume.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3>Get Hired</h3>
+                    <p>Track applications, schedule interviews, and land your dream job.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="companies-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Top Hiring Companies</h2>
+                <p>Join thousands of professionals working at these amazing companies</p>
+            </div>
+            
+            <div class="companies-grid">
+                <div class="company-card">
+                    <div class="company-logo-large">TC</div>
+                    <div class="company-info">
+                        <h4>TechCorp</h4>
+                        <p>Software & Technology</p>
+                        <span class="company-jobs">45 Open Positions</span>
+                    </div>
+                </div>
+                
+                <div class="company-card">
+                    <div class="company-logo-large">DC</div>
+                    <div class="company-info">
+                        <h4>DesignCo</h4>
+                        <p>Creative & Design</p>
+                        <span class="company-jobs">28 Open Positions</span>
+                    </div>
+                </div>
+                
+                <div class="company-card">
+                    <div class="company-logo-large">MG</div>
+                    <div class="company-info">
+                        <h4>MarketGrow</h4>
+                        <p>Marketing & Sales</p>
+                        <span class="company-jobs">32 Open Positions</span>
+                    </div>
+                </div>
+                
+                <div class="company-card">
+                    <div class="company-logo-large">FS</div>
+                    <div class="company-info">
+                        <h4>FinanceStack</h4>
+                        <p>Finance & Banking</p>
+                        <span class="company-jobs">24 Open Positions</span>
+                    </div>
+                </div>
+                
+                <div class="company-card">
+                    <div class="company-logo-large">HC</div>
+                    <div class="company-info">
+                        <h4>HealthCare+</h4>
+                        <p>Healthcare</p>
+                        <span class="company-jobs">38 Open Positions</span>
+                    </div>
+                </div>
+                
+                <div class="company-card">
+                    <div class="company-logo-large">ES</div>
+                    <div class="company-info">
+                        <h4>EduServe</h4>
+                        <p>Education</p>
+                        <span class="company-jobs">21 Open Positions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Start Your Career Journey?</h2>
+                <p>Join thousands of successful professionals who found their dream jobs through JobPortal. Create your free account today and unlock endless opportunities.</p>
+                
+                <div class="cta-buttons">
+                    <a href="#" id="ctaRegisterBtn" class="btn" style="background: white; color: #2563eb; padding: 18px 40px; font-size: 1.2rem; font-weight: 600;">
+                        <i class="fas fa-user-plus"></i> Get Started For Free
+                    </a>
+                    <a href="jobs.html" class="btn btn-secondary" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3); padding: 18px 40px; font-size: 1.2rem; font-weight: 600;">
+                        <i class="fas fa-play-circle"></i> How It Works
+                    </a>
+                </div>
+                
+                <div style="margin-top: 50px; display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700;">4.8</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Average Rating</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700;">24h</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Avg. Response Time</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700;">98%</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Satisfaction Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="footer">
+        <div class="container">
+            <p>Job Portal Demo - College Project &copy; 2023</p>
+            <p>Created with HTML, CSS & JavaScript</p>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="jobs.html">Jobs</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="#" id="aboutBtn">About</a>
+                <a href="#" id="contactBtn">Contact</a>
+            </div>
+            <div style="margin-top: 20px;">
+                <a href="#" style="color: #d1d5db; margin: 0 10px; font-size: 1.2rem;"><i class="fab fa-linkedin"></i></a>
+                <a href="#" style="color: #d1d5db; margin: 0 10px; font-size: 1.2rem;"><i class="fab fa-twitter"></i></a>
+                <a href="#" style="color: #d1d5db; margin: 0 10px; font-size: 1.2rem;"><i class="fab fa-facebook"></i></a>
+                <a href="#" style="color: #d1d5db; margin: 0 10px; font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./js/script.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Homepage loaded');
+            
+
+            initializeHomepage();
+            
+
+            loadFeaturedJobs();
+            
+
+            setupHomepageListeners();
+        });
+        
+        function initializeHomepage() {
+
+            animateStats();
+            
+
+            document.querySelectorAll('.search-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    if (this.textContent === 'Find Talent') {
+                        document.querySelector('.hero-search h3').textContent = 'Hire Top Talent';
+                        document.querySelector('#homeSearch').placeholder = 'Job title or skill needed';
+                        document.querySelector('#homeLocation').placeholder = 'Location or remote';
+                        document.querySelector('#homeSearchBtn').innerHTML = '<i class="fas fa-search"></i> Find Candidates';
+                    } else {
+                        document.querySelector('.hero-search h3').textContent = 'Find Your Dream Job';
+                        document.querySelector('#homeSearch').placeholder = 'Job title, keyword, or company';
+                        document.querySelector('#homeLocation').placeholder = 'City, state, or remote';
+                        document.querySelector('#homeSearchBtn').innerHTML = '<i class="fas fa-search"></i> Search Jobs';
+                    }
+                });
+            });
+            
+
+            document.querySelectorAll('.step-card, .stat-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+        
+        function animateStats() {
+            const stats = {
+                'statsJobs': 50000,
+                'statsCompanies': 5000,
+                'statsHired': 10000,
+                'statsCountries': 100
+            };
+            
+            Object.entries(stats).forEach(([id, target]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    animateCounter(element, target, 2000);
+                }
+            });
+        }
+        
+        function animateCounter(element, target, duration) {
+            let start = 0;
+            const increment = target / (duration / 16); // 60fps
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= target) {
+                    element.textContent = target.toLocaleString() + '+';
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(start).toLocaleString() + '+';
+                }
+            }, 16);
+        }
+        
+        function loadFeaturedJobs() {
+            const container = document.getElementById('featuredJobsGrid');
+            
+
+            if (typeof JOBS_DATA !== 'undefined') {
+   
+                const featuredJobs = JOBS_DATA.slice(0, 3);
+                
+                let jobsHTML = '';
+                featuredJobs.forEach(job => {
+    
+                    const companyInitials = job.company.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
+                    
+
+                    let typeClass = 'job-tag-home';
+                    if (job.type.includes('Full')) typeClass += ' job-tag-home-fulltime';
+                    if (job.type.includes('Part')) typeClass += ' job-tag-home-parttime';
+                    if (job.type.includes('Intern')) typeClass += ' job-tag-home-internship';
+                    
+                    jobsHTML += `
+                        <div class="job-card-featured">
+                            <span class="job-featured-badge">Featured</span>
+                            <div class="job-card-content">
+                                <div class="job-card-header">
+                                    <div class="company-logo-home">
+                                        ${companyInitials}
+                                    </div>
+                                    <div class="job-info">
+                                        <h3>${job.title}</h3>
+                                        <p>${job.company} • ${job.location}</p>
+                                        <div class="job-tags-home">
+                                            <span class="${typeClass}">${job.type}</span>
+                                            <span class="job-tag-home">${job.category || 'General'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="job-details-grid">
+                                    <div class="job-detail-item">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <span>${job.salary}</span>
+                                    </div>
+                                    <div class="job-detail-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>${job.posted}</span>
+                                    </div>
+                                    <div class="job-detail-item">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>${Math.random() > 0.5 ? '2-5 Years' : '0-2 Years'}</span>
+                                    </div>
+                                    <div class="job-detail-item">
+                                        <i class="fas fa-users"></i>
+                                        <span>${Math.floor(Math.random() * 50) + 10} Applicants</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                    <a href="./job-details.html?id=${job.id}" class="btn" style="flex: 2;">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </a>
+                                    <a href="./apply.html?id=${job.id}" class="btn btn-success" style="flex: 1;">
+                                        <i class="fas fa-paper-plane"></i> Apply
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = jobsHTML;
+            } else {
+ 
+                container.innerHTML = `
+                    <div class="job-card-featured">
+                        <div class="job-card-content">
+                            <div class="job-card-header">
+                                <div class="company-logo-home">TC</div>
+                                <div class="job-info">
+                                    <h3>Frontend Developer</h3>
+                                    <p>TechCorp • Remote</p>
+                                    <div class="job-tags-home">
+                                        <span class="job-tag-home">Full-time</span>
+                                        <span class="job-tag-home">Development</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="job-details-grid">
+                                <div class="job-detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>$80,000 - $100,000</span>
+                                </div>
+                                <div class="job-detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>2 days ago</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <a href="./jobs.html" class="btn" style="flex: 2;">View Details</a>
+                                <a href="./apply.html" class="btn btn-success" style="flex: 1;">Apply</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-featured">
+                        <div class="job-card-content">
+                            <div class="job-card-header">
+                                <div class="company-logo-home">DC</div>
+                                <div class="job-info">
+                                    <h3>UI/UX Designer</h3>
+                                    <p>DesignCo • New York</p>
+                                    <div class="job-tags-home">
+                                        <span class="job-tag-home">Full-time</span>
+                                        <span class="job-tag-home">Design</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="job-details-grid">
+                                <div class="job-detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>$70,000 - $90,000</span>
+                                </div>
+                                <div class="job-detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>1 week ago</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <a href="./jobs.html" class="btn" style="flex: 2;">View Details</a>
+                                <a href="./apply.html" class="btn btn-success" style="flex: 1;">Apply</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-featured">
+                        <div class="job-card-content">
+                            <div class="job-card-header">
+                                <div class="company-logo-home">MG</div>
+                                <div class="job-info">
+                                    <h3>Marketing Manager</h3>
+                                    <p>MarketGrow • Remote</p>
+                                    <div class="job-tags-home">
+                                        <span class="job-tag-home">Full-time</span>
+                                        <span class="job-tag-home">Marketing</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="job-details-grid">
+                                <div class="job-detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>$65,000 - $85,000</span>
+                                </div>
+                                <div class="job-detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>3 days ago</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <a href="./jobs.html" class="btn" style="flex: 2;">View Details</a>
+                                <a href="./apply.html" class="btn btn-success" style="flex: 1;">Apply</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function setupHomepageListeners() {
+
+            document.getElementById('homeSearchBtn').addEventListener('click', performHomeSearch);
+            
+
+            document.querySelectorAll('.search-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const jobType = this.dataset.job;
+                    document.getElementById('homeSearch').value = jobType.charAt(0).toUpperCase() + jobType.slice(1);
+                    if (jobType === 'remote') {
+                        document.getElementById('homeLocation').value = 'Remote';
+                    }
+                });
+            });
+            
+
+            document.getElementById('registerHeroBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                showRegistrationModal('employer');
+            });
+            
+
+            document.getElementById('ctaRegisterBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                showRegistrationModal('jobseeker');
+            });
+            
+
+            document.getElementById('aboutBtn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showAboutModal();
+            });
+            
+            document.getElementById('contactBtn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showContactModal();
+            });
+            
+
+            document.getElementById('homeSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') performHomeSearch();
+            });
+            
+            document.getElementById('homeLocation').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') performHomeSearch();
+            });
+            
+
+            setTimeout(() => {
+                document.getElementById('homeSearch').focus();
+            }, 1000);
+        }
+        
+        function performHomeSearch() {
+            const searchTerm = document.getElementById('homeSearch').value.trim();
+            const location = document.getElementById('homeLocation').value.trim();
+            
+            if (!searchTerm && !location) {
+
+                window.location.href = './jobs.html';
+                return;
+            }
+            
+
+            let query = '';
+            if (searchTerm) query += `search=${encodeURIComponent(searchTerm)}`;
+            if (location) query += `${query ? '&' : ''}location=${encodeURIComponent(location)}`;
+            
+
+            window.location.href = `./jobs.html${query ? '?' + query : ''}`;
+        }
+        
+        function showRegistrationModal(type) {
+            const title = type === 'employer' ? 'Post Jobs & Hire Talent' : 'Find Your Dream Job';
+            const description = type === 'employer' 
+                ? 'Create an employer account to post jobs, manage applications, and find the best candidates.'
+                : 'Create a job seeker account to apply for jobs, track applications, and get matched with opportunities.';
+            
+            const modalHTML = `
+                <div class="modal" id="registrationModal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3>${title}</h3>
+                            <button class="modal-close" onclick="closeModal('registrationModal')">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="margin-bottom: 20px; color: #6b7280;">${description}</p>
+                            
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" class="filter-input" id="regName" placeholder="Enter your full name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" class="filter-input" id="regEmail" placeholder="Enter your email">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Account Type</label>
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button class="btn ${type === 'jobseeker' ? 'active' : ''}" 
+                                            onclick="switchAccountType('jobseeker')" 
+                                            style="flex: 1;">
+                                        Job Seeker
+                                    </button>
+                                    <button class="btn ${type === 'employer' ? 'active' : ''}" 
+                                            onclick="switchAccountType('employer')" 
+                                            style="flex: 1;">
+                                        Employer
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions" style="margin-top: 30px;">
+                                <button class="btn btn-success" onclick="submitRegistration('${type}')">
+                                    <i class="fas fa-user-plus"></i> Create Account
+                                </button>
+                                <button class="btn btn-secondary" onclick="closeModal('registrationModal')">
+                                    Cancel
+                                </button>
+                            </div>
+                            
+                            <p style="text-align: center; margin-top: 20px; color: #6b7280; font-size: 0.9rem;">
+                                Already have an account? <a href="#" onclick="showLoginModal()" style="color: #2563eb;">Login here</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('registrationModal');
+            if (existingModal) existingModal.remove();
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Show modal
+            setTimeout(() => {
+                document.getElementById('registrationModal').classList.add('active');
+            }, 10);
+        }
+        
+        function showLoginModal() {
+            closeModal('registrationModal');
+            
+            const modalHTML = `
+                <div class="modal" id="loginModal">
+                    <div class="modal-content" style="max-width: 400px;">
+                        <div class="modal-header">
+                            <h3>Login to JobPortal</h3>
+                            <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" class="filter-input" id="loginEmail" placeholder="Enter your email">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" class="filter-input" id="loginPassword" placeholder="Enter your password">
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                                <label style="display: flex; align-items: center; gap: 5px; font-size: 0.9rem;">
+                                    <input type="checkbox"> Remember me
+                                </label>
+                                <a href="#" style="color: #2563eb; font-size: 0.9rem;">Forgot password?</a>
+                            </div>
+                            
+                            <div class="form-actions" style="margin-top: 30px;">
+                                <button class="btn btn-success" onclick="submitLogin()" style="width: 100%;">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </button>
+                            </div>
+                            
+                            <p style="text-align: center; margin-top: 20px; color: #6b7280; font-size: 0.9rem;">
+                                Don't have an account? <a href="#" onclick="showRegistrationModal('jobseeker')" style="color: #2563eb;">Sign up here</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            setTimeout(() => {
+                document.getElementById('loginModal').classList.add('active');
+            }, 10);
+        }
+        
+        function showAboutModal() {
+            const modalHTML = `
+                <div class="modal" id="aboutModal">
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h3>About JobPortal</h3>
+                            <button class="modal-close" onclick="closeModal('aboutModal')">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="font-size: 3rem; color: #2563eb; margin-bottom: 10px;">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <h3 style="margin-bottom: 10px;">Your Career Success Partner</h3>
+                            </div>
+                            
+                            <p style="line-height: 1.6; margin-bottom: 20px;">
+                                JobPortal is a comprehensive job search platform designed to connect talented professionals 
+                                with top employers. Our mission is to make the job search process efficient, effective, 
+                                and enjoyable for everyone.
+                            </p>
+                            
+                            <h4 style="margin: 25px 0 15px 0;">Our Features</h4>
+                            <ul style="padding-left: 20px; margin-bottom: 20px; line-height: 1.6;">
+                                <li>Advanced job search with smart filters</li>
+                                <li>One-click application system</li>
+                                <li>Personalized job recommendations</li>
+                                <li>Application tracking dashboard</li>
+                                <li>Company reviews and ratings</li>
+                                <li>Career resources and guidance</li>
+                            </ul>
+                            
+                            <p style="line-height: 1.6; color: #6b7280; font-size: 0.9rem;">
+                                This platform is a college project demo created to showcase modern web development 
+                                techniques using HTML, CSS, and JavaScript.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            setTimeout(() => {
+                document.getElementById('aboutModal').classList.add('active');
+            }, 10);
+        }
+        
+        function showContactModal() {
+            const modalHTML = `
+                <div class="modal" id="contactModal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3>Contact Us</h3>
+                            <button class="modal-close" onclick="closeModal('contactModal')">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="font-size: 3rem; color: #2563eb; margin-bottom: 10px;">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <h3 style="margin-bottom: 10px;">We're Here to Help</h3>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Your Name</label>
+                                <input type="text" class="filter-input" placeholder="Enter your name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" class="filter-input" placeholder="Enter your email">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select class="filter-input">
+                                    <option>General Inquiry</option>
+                                    <option>Technical Support</option>
+                                    <option>Account Issues</option>
+                                    <option>Feedback</option>
+                                    <option>Partnership</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea class="filter-input" rows="4" placeholder="How can we help you?"></textarea>
+                            </div>
+                            
+                            <div class="form-actions" style="margin-top: 30px;">
+                                <button class="btn btn-success" onclick="submitContact()" style="width: 100%;">
+                                    <i class="fas fa-paper-plane"></i> Send Message
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-radius: 10px;">
+                                <h4 style="margin-bottom: 10px;">Other Ways to Reach Us</h4>
+                                <p style="margin: 5px 0;"><i class="fas fa-envelope" style="color: #2563eb;"></i> support@jobportal.demo</p>
+                                <p style="margin: 5px 0;"><i class="fas fa-phone" style="color: #2563eb;"></i> +1 (555) 123-4567</p>
+                                <p style="margin: 5px 0;"><i class="fas fa-clock" style="color: #2563eb;"></i> Monday - Friday, 9AM - 6PM EST</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            setTimeout(() => {
+                document.getElementById('contactModal').classList.add('active');
+            }, 10);
+        }
+        
+        // Global functions for modals
+        window.switchAccountType = function(type) {
+            const buttons = document.querySelectorAll('#registrationModal .btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update form description
+            const description = type === 'employer' 
+                ? 'Create an employer account to post jobs, manage applications, and find the best candidates.'
+                : 'Create a job seeker account to apply for jobs, track applications, and get matched with opportunities.';
+            
+            document.querySelector('#registrationModal .modal-body p').textContent = description;
+        };
+        
+        window.submitRegistration = function(type) {
+            const name = document.getElementById('regName')?.value.trim();
+            const email = document.getElementById('regEmail')?.value.trim();
+            
+            if (!name || !email) {
+                showNotification('Please fill in all required fields', 'warning');
+                return;
+            }
+            
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userType', type);
+            
+            const message = type === 'employer' 
+                ? 'Employer account created! You can now post jobs.'
+                : 'Account created successfully! Welcome to JobPortal.';
+            
+            showNotification(message, 'success');
+            
+            closeModal('registrationModal');
+            setTimeout(() => {
+                if (type === 'employer') {
+                    window.location.href = './dashboard.html';
+                } else {
+                    window.location.href = './dashboard.html';
+                }
+            }, 1500);
+        };
+        
+        window.submitLogin = function() {
+            const email = document.getElementById('loginEmail')?.value.trim();
+            
+            if (!email) {
+                showNotification('Please enter your email', 'warning');
+                return;
+            }
+            
+            showNotification('Login successful! Welcome back.', 'success');
+            closeModal('loginModal');
+            setTimeout(() => {
+                window.location.href = './dashboard.html';
+            }, 1000);
+        };
+        
+        window.submitContact = function() {
+            showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+            closeModal('contactModal');
+        };
+        
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        };
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                min-width: 300px;
+                max-width: 400px;
+                z-index: 10000;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; margin-left: 15px;">
+                    &times;
+                </button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOutRight 0.3s ease forwards';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+            
+            if (!document.querySelector('#notificationStyles')) {
+                const style = document.createElement('style');
+                style.id = 'notificationStyles';
+                style.textContent = `
+                    @keyframes slideInRight {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slideOutRight {
+                        from {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                        to {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal.active');
+                modals.forEach(modal => {
+                    const modalId = modal.id;
+                    closeModal(modalId);
+                });
+            }
+        });
+        
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.step-card, .stat-card, .company-card, .job-card-featured').forEach(el => {
+                observer.observe(el);
+            });
+        }
+        
+        window.addEventListener('load', initScrollAnimations);
+    </script>
+</body>
+</html>

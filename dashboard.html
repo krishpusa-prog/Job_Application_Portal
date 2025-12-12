@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - JobPortal</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💼</text></svg>">
+    <style>
+
+
+.dashboard {
+    padding: 20px 0 40px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    color: #1f2937;
+}
+
+.user-welcome {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.user-welcome h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+}
+
+.user-welcome p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.stat-card:nth-child(1) .stat-icon {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.stat-card:nth-child(2) .stat-icon {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.stat-card:nth-child(3) .stat-icon {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.stat-card:nth-child(4) .stat-icon {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.dashboard-card-header h3 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.3rem;
+}
+
+.dashboard-card-header .btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+.applications-list, .saved-jobs-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.application-item, .saved-job-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s;
+}
+
+.application-item:hover, .saved-job-item:hover {
+    background-color: #f9fafb;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border-radius: 5px;
+}
+
+.application-item:last-child, .saved-job-item:last-child {
+    border-bottom: none;
+}
+
+.application-info h4, .saved-job-info h4 {
+    margin: 0 0 5px 0;
+    color: #1f2937;
+    font-size: 1rem;
+}
+
+.application-info p, .saved-job-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-viewed {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.status-accepted {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-interview {
+    background-color: #f3e8ff;
+    color: #7c3aed;
+}
+
+.application-actions, .saved-job-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+
+.profile-section {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 25px;
+    align-items: start;
+}
+
+.profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto;
+}
+
+.profile-details h3 {
+    margin: 0 0 10px 0;
+    color: #1f2937;
+}
+
+.profile-details p {
+    margin: 5px 0;
+    color: #6b7280;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.skill-tag {
+    background: #e5e7eb;
+    color: #4b5563;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.skill-tag i {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.quick-stat {
+    text-align: center;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.quick-stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 5px;
+}
+
+.quick-stat-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+
+.activity-timeline {
+    margin-top: 20px;
+}
+
+.activity-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.activity-content h5 {
+    margin: 0 0 5px 0;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+.activity-content p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 5px;
+}
+
+
+.action-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.action-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    border-color: #2563eb;
+}
+
+.action-card i {
+    font-size: 2.5rem;
+    color: #2563eb;
+    margin-bottom: 15px;
+}
+
+.action-card h4 {
+    margin: 0 0 10px 0;
+    color: #1f2937;
+}
+
+.action-card p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    margin-bottom: 20px;
+}
+
+
+@media (max-width: 768px) {
+    .profile-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .application-item, .saved-job-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .application-actions, .saved-job-actions {
+        align-self: flex-end;
+    }
+    
+    .action-cards {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-briefcase"></i>
+                <span>JobPortal</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html">Home</a>
+                <a href="jobs.html">Browse Jobs</a>
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <span style="color: #2563eb; font-weight: 600; margin-left: 20px;" id="headerUserName">User</span>
+            </nav>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+
+    <main>
+        <div class="container">
+            <div class="dashboard">
+                    <div class="dashboard-header">
+                    <h1>Dashboard Overview</h1>
+                    <div class="user-welcome">
+                        <h2 id="welcomeMessage">Welcome back!</h2>
+                        <p id="userEmailDisplay">Loading...</p>
+                    </div>
+                </div>
+
+
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <span class="stat-number" id="appliedCount">0</span>
+                        <span class="stat-label">Applications Sent</span>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <span class="stat-number" id="viewedCount">0</span>
+                        <span class="stat-label">Profile Views</span>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <span class="stat-number" id="savedCount">0</span>
+                        <span class="stat-label">Saved Jobs</span>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <span class="stat-number" id="interviewsCount">0</span>
+                        <span class="stat-label">Interviews</span>
+                    </div>
+                </div>
+
+
+                <div class="dashboard-grid">
+
+                    <div>
+
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h3>Recent Applications</h3>
+                                <a href="jobs.html" class="btn">Apply for More</a>
+                            </div>
+                            <div class="applications-list" id="applicationsList">
+
+                                <div class="empty-state">
+                                    <i class="fas fa-file-alt"></i>
+                                    <p>No applications yet</p>
+                                    <a href="jobs.html" class="btn">Browse Jobs</a>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="dashboard-card" style="margin-top: 30px;">
+                            <div class="dashboard-card-header">
+                                <h3>Recent Activity</h3>
+                            </div>
+                            <div class="activity-timeline" id="activityTimeline">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h5>Profile Updated</h5>
+                                        <p>You updated your profile information</p>
+                                        <div class="activity-time">Just now</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h5>Job Search</h5>
+                                        <p>You searched for "Frontend Developer" jobs</p>
+                                        <div class="activity-time">2 hours ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div>
+
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h3>My Profile</h3>
+                                <button class="btn" id="editProfileBtn">Edit</button>
+                            </div>
+                            <div class="profile-section">
+                                <div>
+                                    <div class="profile-avatar-large">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="quick-stats">
+                                        <div class="quick-stat">
+                                            <span class="quick-stat-value" id="profileCompletion">75%</span>
+                                            <span class="quick-stat-label">Complete</span>
+                                        </div>
+                                        <div class="quick-stat">
+                                            <span class="quick-stat-value" id="responseRate">40%</span>
+                                            <span class="quick-stat-label">Response</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="profile-details">
+                                    <h3 id="profileName">Loading...</h3>
+                                    <p id="profileEmail">Loading...</p>
+                                    <p><i class="fas fa-phone"></i> <span id="profilePhone">+1 (555) 123-4567</span></p>
+                                    <p><i class="fas fa-map-marker-alt"></i> <span id="profileLocation">New York, NY</span></p>
+                                    <p><i class="fas fa-calendar"></i> Member since: <span id="memberSince">Today</span></p>
+                                    
+                                    <div class="profile-actions">
+                                        <button class="btn" id="uploadResumeBtn">
+                                            <i class="fas fa-upload"></i> Resume
+                                        </button>
+                                        <button class="btn btn-secondary" id="updatePhotoBtn">
+                                            <i class="fas fa-camera"></i> Photo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div style="margin-top: 25px;">
+                                <h4 style="margin-bottom: 15px; color: #1f2937;">Skills & Expertise</h4>
+                                <div class="skills-list" id="skillsList">
+                                    <span class="skill-tag">JavaScript <i class="fas fa-star"></i></span>
+                                    <span class="skill-tag">HTML/CSS</span>
+                                    <span class="skill-tag">React</span>
+                                    <span class="skill-tag">Node.js</span>
+                                    <span class="skill-tag">Communication</span>
+                                    <span class="skill-tag">Teamwork</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="dashboard-card" style="margin-top: 30px;">
+                            <div class="dashboard-card-header">
+                                <h3>Saved Jobs</h3>
+                                <a href="jobs.html" class="btn">Browse More</a>
+                            </div>
+                            <div class="saved-jobs-list" id="savedJobsList">
+
+                                <div class="empty-state">
+                                    <i class="fas fa-bookmark"></i>
+                                    <p>No saved jobs yet</p>
+                                    <a href="jobs.html" class="btn">Save Jobs</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h3>Quick Actions</h3>
+                    </div>
+                    <div class="action-cards">
+                        <div class="action-card" onclick="window.location.href='jobs.html'">
+                            <i class="fas fa-search"></i>
+                            <h4>Find Jobs</h4>
+                            <p>Browse new job opportunities</p>
+                        </div>
+                        
+                        <div class="action-card" id="buildResumeBtn">
+                            <i class="fas fa-file-alt"></i>
+                            <h4>Build Resume</h4>
+                            <p>Create or update your resume</p>
+                        </div>
+                        
+                        <div class="action-card" id="practiceInterviewBtn">
+                            <i class="fas fa-video"></i>
+                            <h4>Practice Interview</h4>
+                            <p>Prepare for interviews</p>
+                        </div>
+                        
+                        <div class="action-card" id="networkBtn">
+                            <i class="fas fa-users"></i>
+                            <h4>Network</h4>
+                            <p>Connect with professionals</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Controls -->
+                <div style="display: flex; justify-content: space-between; margin-top: 30px; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <button class="btn" id="exportDataBtn">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                        <button class="btn btn-secondary" id="printDashboardBtn">
+                            <i class="fas fa-print"></i> Print Dashboard
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger" id="resetDemoBtn">
+                            <i class="fas fa-redo"></i> Reset Demo
+                        </button>
+                        <button class="btn" id="helpBtn">
+                            <i class="fas fa-question-circle"></i> Help
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <p>Job Portal Demo - College Project &copy; 2023</p>
+            <p>Created with HTML, CSS & JavaScript</p>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="jobs.html">Jobs</a>
+                <a href="dashboard.html">Dashboard</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./js/script.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Dashboard loaded");
+            
+
+            const userName = localStorage.getItem('userName') || 'User';
+            document.getElementById('headerUserName').textContent = userName;
+            
+
+            document.getElementById('editProfileBtn').addEventListener('click', function() {
+                const newName = prompt('Enter your name:', localStorage.getItem('userName') || '');
+                const newEmail = prompt('Enter your email:', localStorage.getItem('userEmail') || '');
+                const newPhone = prompt('Enter your phone:', document.getElementById('profilePhone').textContent);
+                const newLocation = prompt('Enter your location:', document.getElementById('profileLocation').textContent);
+                
+                if (newName) {
+                    localStorage.setItem('userName', newName);
+                    document.getElementById('profileName').textContent = newName;
+                    document.getElementById('headerUserName').textContent = newName;
+                }
+                
+                if (newEmail) {
+                    localStorage.setItem('userEmail', newEmail);
+                    document.getElementById('profileEmail').textContent = newEmail;
+                }
+                
+                if (newPhone) {
+                    document.getElementById('profilePhone').textContent = newPhone;
+                }
+                
+                if (newLocation) {
+                    document.getElementById('profileLocation').textContent = newLocation;
+                }
+                
+                alert('Profile updated successfully!');
+            });
+            
+            document.getElementById('uploadResumeBtn').addEventListener('click', function() {
+                alert('In a real application, this would open a file upload dialog to upload your resume.');
+            });
+            
+            document.getElementById('updatePhotoBtn').addEventListener('click', function() {
+                alert('Profile photo update feature would be implemented here.');
+            });
+            
+   
+            document.getElementById('buildResumeBtn').addEventListener('click', function() {
+                alert('Resume builder feature would open here. You could create and format your resume.');
+            });
+            
+            document.getElementById('practiceInterviewBtn').addEventListener('click', function() {
+                alert('Interview practice feature would open with mock interview questions and recording capability.');
+            });
+            
+            document.getElementById('networkBtn').addEventListener('click', function() {
+                alert('Networking feature would connect you with other professionals and recruiters.');
+            });
+            
+          
+            document.getElementById('exportDataBtn').addEventListener('click', function() {
+                const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
+                const savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
+                
+                const exportData = {
+                    user: localStorage.getItem('userName'),
+                    email: localStorage.getItem('userEmail'),
+                    appliedJobs: appliedJobs,
+                    savedJobs: savedJobs,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = 'jobportal-data.json';
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+                
+                alert('Your data has been exported as JSON file.');
+            });
+            
+            document.getElementById('printDashboardBtn').addEventListener('click', function() {
+                window.print();
+            });
+            
+            document.getElementById('resetDemoBtn').addEventListener('click', function() {
+                if (confirm('Reset all demo data? This will clear your applications, saved jobs, and profile information.')) {
+                    localStorage.clear();
+                    alert('Demo data has been reset. Page will reload.');
+                    location.reload();
+                }
+            });
+            
+            document.getElementById('helpBtn').addEventListener('click', function() {
+                alert('Dashboard Help:\n\n• Click on job cards to view details\n• Use the Edit Profile button to update your information\n• Save jobs you\'re interested in\n• Track your application status\n• Use Quick Actions for common tasks');
+            });
+            
+    
+            const skillsList = document.getElementById('skillsList');
+            if (skillsList.children.length === 0) {
+                const skills = ['JavaScript', 'HTML5', 'CSS3', 'React', 'Git', 'Communication', 'Problem Solving'];
+                skillsList.innerHTML = skills.map(skill => 
+                    `<span class="skill-tag">${skill} <i class="fas fa-star"></i></span>`
+                ).join('');
+            }
+            
+        
+            if (!localStorage.getItem('memberSince')) {
+                const today = new Date().toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                localStorage.setItem('memberSince', today);
+            }
+            document.getElementById('memberSince').textContent = localStorage.getItem('memberSince');
+            
+        
+            function calculateProfileCompletion() {
+                let completion = 75; 
+                const userName = localStorage.getItem('userName');
+                const userEmail = localStorage.getItem('userEmail');
+                
+                if (userName && userEmail) completion += 15;
+                
+      
+                const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
+                if (appliedJobs.length > 0) completion += 10;
+                
+                return Math.min(completion, 100);
+            }
+            
+            document.getElementById('profileCompletion').textContent = `${calculateProfileCompletion()}%`;
+            
+   
+            function calculateResponseRate() {
+                const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
+                if (appliedJobs.length === 0) return "0%";
+                
+
+                const responses = Math.min(Math.floor(appliedJobs.length * 0.4), appliedJobs.length);
+                const rate = Math.floor((responses / appliedJobs.length) * 100);
+                return `${rate}%`;
+            }
+            
+            document.getElementById('responseRate').textContent = calculateResponseRate();
+            
+        
+            function setWelcomeMessage() {
+                const hour = new Date().getHours();
+                let greeting;
+                
+                if (hour < 12) greeting = "Good morning";
+                else if (hour < 18) greeting = "Good afternoon";
+                else greeting = "Good evening";
+                
+                document.getElementById('welcomeMessage').textContent = `${greeting}, ${userName}!`;
+                document.getElementById('userEmailDisplay').textContent = localStorage.getItem('userEmail') || 'Update your email in profile';
+            }
+            
+            setWelcomeMessage();
+            
+
+            function updateDashboardStats() {
+                const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
+                const savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
+                
+
+                const viewedCount = Math.floor(Math.random() * 50) + 10;
+                document.getElementById('viewedCount').textContent = viewedCount;
+                
+   
+                const interviews = Math.min(Math.floor(appliedJobs.length * 0.3), 5);
+                document.getElementById('interviewsCount').textContent = interviews;
+                
+              
+                const welcomeEl = document.getElementById('welcomeMessage');
+                if (appliedJobs.length > 0) {
+                    welcomeEl.innerHTML = `${welcomeEl.textContent} <small style="opacity:0.7;">(${appliedJobs.length} applications sent)</small>`;
+                }
+            }
+            
+            updateDashboardStats();
+            
+      
+            setInterval(() => {
+                const activityTimes = document.querySelectorAll('.activity-time');
+                activityTimes.forEach(el => {
+                    if (el.textContent === 'Just now') {
+                        el.textContent = 'A few minutes ago';
+                    }
+                });
+            }, 60000); 
+        });
+    </script>
+</body>
+</html>
