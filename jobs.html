@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Jobs - JobPortal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💼</text></svg>">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-briefcase"></i>
+                <span>JobPortal</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html">Home</a>
+                <a href="jobs.html" class="active">Browse Jobs</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="#" id="loginBtn">Login</a>
+                <a href="#" id="registerBtn" class="btn">Sign Up</a>
+            </nav>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="container">
+            <h1>Browse Job Opportunities</h1>
+            
+            <!-- FILTERS -->
+            <section class="job-filters">
+                <h3>Filter Jobs</h3>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="jobTypeFilter">Job Type</label>
+                        <select id="jobTypeFilter">
+                            <option value="all">All Types</option>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Remote">Remote</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="locationFilter">Location</label>
+                        <input type="text" id="locationFilter" placeholder="City or remote">
+                    </div>
+                    <div class="filter-group">
+                        <label for="salaryFilter">Salary Range</label>
+                        <select id="salaryFilter">
+                            <option value="all">All Salaries</option>
+                            <option value="low">Under $50,000</option>
+                            <option value="medium">$50,000 - $80,000</option>
+                            <option value="high">Over $80,000</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" style="align-self: flex-end;">
+                        <button id="filterBtn" class="btn">Apply Filters</button>
+                        <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- JOB LISTINGS -->
+            <section class="job-listings">
+                <h2>Available Jobs</h2>
+                <div class="jobs-grid">
+                    <!-- Jobs will be loaded by JavaScript -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <p>Job Portal Demo - College Project &copy; 2023</p>
+            <p>Created with HTML, CSS & JavaScript</p>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="jobs.html">Jobs</a>
+                <a href="dashboard.html">Dashboard</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

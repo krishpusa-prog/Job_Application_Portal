@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - JobPortal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💼</text></svg>">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-briefcase"></i>
+                <span>JobPortal</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html">Home</a>
+                <a href="jobs.html">Browse Jobs</a>
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <span id="userName">Welcome, User!</span>
+            </nav>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="container">
+            <div class="dashboard">
+                <h1>My Dashboard</h1>
+                
+                <!-- User Profile -->
+                <div class="dashboard-card">
+                    <h2>Profile Overview</h2>
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-details">
+                            <h3 id="profileName">Loading...</h3>
+                            <p id="profileEmail">Loading...</p>
+                            <p><i class="fas fa-calendar"></i> Member since: Today</p>
+                        </div>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="appliedCount">0</span>
+                            <span class="stat-label">Jobs Applied</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="savedCount">0</span>
+                            <span class="stat-label">Saved Jobs</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">2</span>
+                            <span class="stat-label">Interviews</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applied Jobs -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h3>Recent Applications</h3>
+                        <div id="appliedJobsList">
+                            <p>Loading your applications...</p>
+                        </div>
+                        <a href="jobs.html" class="btn" style="margin-top: 20px; display: block; text-align: center;">Apply for More Jobs</a>
+                    </div>
+
+                    <!-- Saved Jobs -->
+                    <div class="dashboard-card">
+                        <h3>Saved Jobs</h3>
+                        <div id="savedJobsList">
+                            <p>Loading saved jobs...</p>
+                        </div>
+                        <a href="jobs.html" class="btn" style="margin-top: 20px; display: block; text-align: center;">Browse More Jobs</a>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="dashboard-card">
+                    <h3>Quick Actions</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <a href="jobs.html" class="btn"><i class="fas fa-search"></i> Browse Jobs</a>
+                        <button class="btn" id="updateProfileBtn"><i class="fas fa-user-edit"></i> Update Profile</button>
+                        <button class="btn btn-secondary" id="resetDemoBtn"><i class="fas fa-redo"></i> Reset Demo Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <p>Job Portal Demo - College Project &copy; 2023</p>
+            <p>Created with HTML, CSS & JavaScript</p>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="jobs.html">Jobs</a>
+                <a href="dashboard.html">Dashboard</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Additional dashboard functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const updateProfileBtn = document.getElementById('updateProfileBtn');
+            const resetDemoBtn = document.getElementById('resetDemoBtn');
+            
+            if (updateProfileBtn) {
+                updateProfileBtn.addEventListener('click', function() {
+                    const newName = prompt('Enter new name:', localStorage.getItem('userName') || '');
+                    const newEmail = prompt('Enter new email:', localStorage.getItem('userEmail') || '');
+                    
+                    if (newName) localStorage.setItem('userName', newName);
+                    if (newEmail) localStorage.setItem('userEmail', newEmail);
+                    
+                    alert('Profile updated!');
+                    location.reload();
+                });
+            }
+            
+            if (resetDemoBtn) {
+                resetDemoBtn.addEventListener('click', function() {
+                    if (confirm('Reset all demo data? This will clear your applications and saved jobs.')) {
+                        localStorage.clear();
+                        alert('Demo data reset. Page will reload.');
+                        location.reload();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
